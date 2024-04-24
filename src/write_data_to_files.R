@@ -3,10 +3,10 @@ write_data_to_files <- function(rv){
   #library(ggplot2)
   library(meteR) # rominger and merow, 2016
   library(benthos)
-  source('./src 04-2024 no metappn/est_RAI.R')
-  source('./src 04-2024 no metappn/calc_correlation_length.R')
-  source('./src 04-2024 no metappn/calculate_dissimilarity.R')
-  source('./src 04-2024 no metappn/calc_Morans_I.R')
+  source('./src/est_RAI.R')
+  source('./src/calc_correlation_length.R')
+  source('./src/calculate_dissimilarity.R')
+  source('./src/calc_Morans_I.R')
   
   # Per community, calculate the number of species, METE fit, Pm, m_dist, 
   # and shannon index.
@@ -28,7 +28,7 @@ write_data_to_files <- function(rv){
   # the restoration model. (matrix of species numbers of all subcommunities 
   # x 1000 individuals).
   
-  filename  <- paste('./results/simulation results 04-2024/landscapes/landscapes_',
+  filename  <- paste('./results/landscapes/landscapes_',
                      rv$sim_nr, '_', rv$clustering, '.txt', sep='')
   landscape <- read.table(filename)
   
@@ -98,7 +98,7 @@ write_data_to_files <- function(rv){
                    m_dist     = m_dist[landscape[(landscape[,iFrag] == 1),20]==1],
                    Shannon    = H[landscape[(landscape[,iFrag] == 1),20]==1])
   
-  filename <- paste('./results/simulation results 04-2024/subcommunity_data/subcommunity_data_',
+  filename <- paste('./results/subcommunity_data/subcommunity_data_',
                     rv$sim_nr, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -124,7 +124,7 @@ write_data_to_files <- function(rv){
                    mutation_rate = rv$mutation_rate,
                    max_mutation  = rv$max_mutation)
   
-  filename <- paste('./results/simulation results 04-2024/simulation_data/simulation_data_',
+  filename <- paste('./results/simulation_data/simulation_data_',
                     rv$sim_nr, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -144,7 +144,7 @@ write_data_to_files <- function(rv){
                          max_mutation  = rv$max_mutation,
                          disp_cap   = disp,
                          perc_indiv = p_disp)
-  filename <- paste('./results/simulation results 04-2024/dispersal_capacity/dispersal capacity_data_',
+  filename <- paste('./results/dispersal_capacity/dispersal capacity_data_',
                     rv$sim_nr, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -162,7 +162,7 @@ write_data_to_files <- function(rv){
                    max_mutation  = rv$max_mutation,
                    dispersal_capacity = unique(rv$Pm),
                    corr_length= C)
-  filename <- paste('./results/simulation results 04-2024/correlation_length/correlation_length_data_',
+  filename <- paste('./results/correlation_length/correlation_length_data_',
                     rv$sim_nr, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -179,7 +179,7 @@ write_data_to_files <- function(rv){
                    max_mutation  = rv$max_mutation,
                    distance      = dissimilarity[,1],
                    dissimilarity = dissimilarity[,2])
-  filename <- paste('./results/simulation results 04-2024/dissimilarity/dissimilarity_data_',
+  filename <- paste('./results/dissimilarity/dissimilarity_data_',
                     rv$sim_nr, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -192,7 +192,7 @@ write_data_to_files <- function(rv){
   # x 1000 individuals).
   df <- matrix(paste(rv$species, rv$Pm, sep='-'), rv$n_ind, )
   df <- df[,rv$comm_type == 'sub']
-  filename <- paste('./results/simulation results 04-2024/community_composition/',
+  filename <- paste('./results/community_composition/',
                     rv$clustering,'_',rv$sim_nr, '_',rv$frag, 
                     '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
   write.table(df, filename, append=FALSE, col.names = FALSE, row.names = FALSE)

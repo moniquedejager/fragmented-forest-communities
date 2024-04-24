@@ -2,10 +2,10 @@
 
 fragment_community <- function(n_ind, Pm_range,clustering, sim_nr, mutation_rate, max_mutation){
   library(ggplot2)
-  source('src 04-2024 no metappn/simulate_community_dynamics.R')
-  source('./src 04-2024 no metappn/write_data_to_files.R')
+  source('src/simulate_community_dynamics.R')
+  source('./src/write_data_to_files.R')
   
-  filename  <- paste('./results/simulation results 04-2024/landscapes/landscapes_',
+  filename  <- paste('./results/landscapes/landscapes_',
                      sim_nr, '_', clustering, '.txt', sep='')
   landscape <- as.matrix(read.table(filename))
   
@@ -66,13 +66,13 @@ fragment_community <- function(n_ind, Pm_range,clustering, sim_nr, mutation_rate
   for (iFrag in 1:20){
     frag <- seq(0, 95, 5)[iFrag]
     
-    filename <- paste('./results/simulation results 04-2024/community_composition/',
+    filename <- paste('./results/community_composition/',
                       rv$clustering,'_',sim_nr, '_',frag, 
                       '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
     if (!file.exists(filename)){
 
      if ((frag > 0)&(startup == TRUE)){
-       filename <- paste('./results/simulation results 04-2024/community_composition/',
+       filename <- paste('./results/community_composition/',
                          rv$clustering,'_',sim_nr, '_',frag - 5, 
                          '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
         a        <- as.vector(as.matrix(read.table(filename)))

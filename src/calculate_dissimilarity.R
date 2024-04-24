@@ -2,7 +2,7 @@ calc_dissimilarity <- function(rv){
   # Calculate the Bray-Curtis dissimilarity between subcommunities
   df2 <- matrix(rv$species, rv$n_ind,)
   
-  filename  <- paste('./results/simulation results 04-2024/landscapes/landscapes_',
+  filename  <- paste('./results/landscapes/landscapes_',
                      rv$sim_nr, '_', rv$clustering, '.txt', sep='')
   landscape <- read.table(filename)
   species   <- df2[,(landscape[,20]==1)]

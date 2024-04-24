@@ -3,7 +3,7 @@ calc_Morans_I <- function(rv){
   
   # libraries:
   library(GGally)    
-  source('./src 04-2024 no metappn/calculate_patch_size.R')
+  source('./src/calculate_patch_size.R')
   
   n <- rv$nx
   x <- rep(1:n, n)
