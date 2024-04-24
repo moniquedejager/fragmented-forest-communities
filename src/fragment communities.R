@@ -63,7 +63,7 @@ fragment_community <- function(n_ind, Pm_range,clustering, sim_nr, mutation_rate
   # read in which patches are still habitat and which are destructed. 
 
   startup <- TRUE
-  for (iFrag in 1:20){
+  for (iFrag in 1){ #:20){
     frag <- seq(0, 95, 5)[iFrag]
     
     filename <- paste('./results/community_composition/',
@@ -109,9 +109,9 @@ library(future.apply)
 n_ind        <- 1000
 Pm_range     <- 0.5
 clustering   <- c(1, 3, 5)
-mutation_rate <- 0.0001 #c(0.00001, 0.0001, 0.001, 0.01)
-max_mutation <- 0.05 # c(0, 0.05, 0.1, 0.15, 0.2)
-sim_nr       <- 1:10
+mutation_rate <- c(0.00001, 0.0001, 0.001, 0.01)
+max_mutation <- c(0, 0.05, 0.1, 0.15, 0.2)
+sim_nr       <- 1:5
 
 dat <- expand.grid(n_ind = n_ind, 
                    Pm_range = Pm_range, 
