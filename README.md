@@ -1,5 +1,7 @@
 # fragmented-forest-communities
 
+This branch is created to test the effects of different mutation rates and mutation sizes
+
 # FragmentedForests
 spatially explicit IBM of forests under fragmentation
 
