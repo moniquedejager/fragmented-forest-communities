@@ -1,7 +1,7 @@
 # Restore communities.R
 # this script is not finished! It is a copy of fragment communities.R
 
-fragment_community <- function(n_ind, Pm_range,clustering, sim_nr, mutation_rate, max_mutation){
+restore_community <- function(n_ind, Pm_range,clustering, sim_nr, mutation_rate, max_mutation){
   library(ggplot2)
   source('src/simulate_community_dynamics.R')
   source('./src/write_data_to_files.R')
@@ -125,7 +125,7 @@ dat <- expand.grid(n_ind = n_ind,
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system
 
 result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) {
-  fragment_community(dat$n_ind[i], dat$Pm_range[i], 
+  restore_community(dat$n_ind[i], dat$Pm_range[i], 
                      dat$clustering[i], dat$sim_nr[i], dat$mutation_rate[i],
                      dat$max_mutation[i])
 }, future.seed = TRUE)
