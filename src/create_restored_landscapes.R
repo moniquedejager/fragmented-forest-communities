@@ -57,7 +57,6 @@ for (sim_nr in 1:10){
           w[is.na(w)] <- 0  # focal patch
         }
         w[hab == 1] <- 0
-        ggplot(df, aes(x=x, y=y, fill=w)) + geom_raster()
         
         # now, add restored sites:
         hab_cover <- mean(hab)
@@ -65,14 +64,11 @@ for (sim_nr in 1:10){
           print(paste('f = ', f))
           
           n_patches <- f * n * n  # number of habitat patches that should remain
-          while (sum(hab) < n_patches){
-            restored    <- sample(1:(n*n), 1, prob = w)
-            hab[restored] <- 1
-            dist <- sqrt((x - x[restored])^2 + (y - y[restored])^2)
-            w    <- w + 1/(2*pi) * ((2 - mu) / (lmax^(2-mu) - lmin^(2-mu))) * dist^(-1*mu)
-            w[is.na(w)] <- 0  # focal patch
-            w[hab == 1] <- 0
-          }
+          n_restore <- n_patches - sum(hab) # number of patches that needs to be restored
+          restored    <- sample(1:(n*n), n_restore, prob = w)
+          
+          hab[restored] <- 1
+          w[hab == 1] <- 0
           
           # write the data to a dataframe and then to a file:
           df2 <- data.frame(x      = x,
@@ -88,7 +84,7 @@ for (sim_nr in 1:10){
     }
     
     #sel <- round(df$f_loss, 2) == 0.80
-    #sel <- df$clustering == 1
+    #sel <- df$clustering == 5
     #ggplot(df[sel,], aes(x=x, y=y, fill=as.factor(hab))) + 
     #  geom_raster() + 
     #  scale_fill_manual(values=c('white', 'darkolivegreen4')) + 
