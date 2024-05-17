@@ -64,6 +64,7 @@ simulate_community_dynamics <- function(rv){
       
       # add mutations:
       mutated             <- runif(length(rv$species), 0, 1) < rv$mutation_rate
+      mutated[rv$species == 0] <- 0
       if (sum(mutated) > 0){
         new_species         <- max(rv$species) + 1:sum(mutated)
         new_Pm              <- rv$Pm[mutated] + sample(seq((-1*rv$max_mutation),rv$max_mutation, 0.05), sum(mutated), replace=TRUE) 

@@ -53,8 +53,8 @@ restore_community <- function(n_ind,
                     '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
   a          <- as.vector(as.matrix(read.table(filename)))
   a2         <- as.numeric(unlist(strsplit(a, '-'))[(1:(length(a)))*2 - 1])
-  hab        <- landscape$hab[(round(landscape$f_loss, 2) == rv$f_loss)&
-                              (landscape$hab_cover == (1 - rv$f_loss))&
+  hab        <- landscape$hab[(abs(landscape$f_loss - rv$f_loss) < 0.01)&
+                              (abs(landscape$hab_cover - (1 - rv$f_loss)) < 0.01)&
                               (landscape$clustering == rv$clustering_restored)]
   comm       <- rv$comm_ID[hab == 1]
   rv$species <- rep(0, rv$n * rv$n_ind)
@@ -76,10 +76,10 @@ restore_community <- function(n_ind,
   rv$tot2     <- length(rv$x2)
   
   # now, add the newly restored habitat patches:
-  hab      <- landscape$hab[(round(landscape$f_loss, 2) == rv$f_loss)&
-                              (landscape$hab_cover == rv$hab_cover)&
+  hab      <- landscape$hab[(abs(landscape$f_loss - rv$f_loss) < 0.01)&
+                              (abs(landscape$hab_cover - rv$hab_cover) < 0.01)&
                               (landscape$clustering == rv$clustering_restored)]
-  
+    
   rv$comm_type[hab == 0] <- 'fragmented'
   rv$comm_type2 <- unlist(lapply(rv$comm_type, function(x) 
         rep(x, rv$n_ind)))

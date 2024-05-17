@@ -76,10 +76,10 @@ write_data_to_files_restoration <- function(rv){
                       rv$sim_nr, '_', rv$clustering, '.txt', sep='')
   landscape  <- read.table(filename, header=TRUE)
   
-  landscape <- landscape[(round(landscape$f_loss, 2) == 0.95)&
-                  (landscape$hab_cover == 0.05)&
-                  (landscape$clustering == rv$clustering_restored),]
-  
+  landscape <- landscape[(abs(landscape$f_loss - 0.95) < 0.01)&
+                               (abs(landscape$hab_cover - 0.05) < 0.01)&
+                               (landscape$clustering == rv$clustering_restored),]
+
   fit2 <- rep(0, rv$n)
   fit2[rv$comm_type == 'sub'] <- fit
   Pm2  <- rep(0, rv$n)
