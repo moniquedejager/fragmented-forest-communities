@@ -1,10 +1,21 @@
-# fragmented-forest-communities
-
-# FragmentedForests
-spatially explicit IBM of forests under fragmentation
+# fragmented-forest-communities: restoration
 
 ## Methods
-In summary, we simulated subcommunity dynamics in a 2-dimensional, semi-spatial, near-neutral, individual-based model. The environment consisted of 20 x 20 cells; in each cell, a subcommunity consisting of 1,000 individuals could exist. Initially, all cells were habitable and contained a subcommunity. These pristine landscapes underwent increasing habitat loss in steps of 5%; each time, community dynamics needed to be stabilized before habitat destruction continued. Habitat destruction was simulated at three fragmentation levels: (i) clustered, (ii) fractal, and (iii) random habitat destruction. Each simulation was run 10 times to account for the stochastic nature of the model. All model simulations and analyses of the resulting data were performed in R version xx (ref to Zenodo). 
+In summary, we simulated subcommunity dynamics in a 2-dimensional, semi-spatial, near-neutral, individual-based model. 
+The environment consisted of 20 x 20 cells; in each cell, a subcommunity consisting of 1,000 individuals could exist. 
+This restoration part of the model is preceded by a fragmentation part. 
+Initially, all cells were habitable and contained a subcommunity in this first part of the model. 
+These pristine landscapes underwent increasing habitat loss in steps of 5%.
+Each time, community dynamics needed to be stabilized before habitat destruction continued. 
+Habitat destruction was simulated at three fragmentation levels: (i) clustered, (ii) fractal, and (iii) random habitat destruction. 
+Each simulation was run 10 times to account for the stochastic nature of the model.
+ 
+Each fragmented landscape resulting from part 1 was used as the basis for the restoration simulations.
+For each of these landscapes, 5, 10, 15, etc. percent of the total area was restored, until all patches contained habitat.
+Habitat patches were added using three different spatial configurations: (i) clustered, (ii) fractal, and (iii) random habitat restoration. 
+Each simulation was run until the average number of species showed no trend in 50 iterations for 5 times.  
+
+All model simulations and analyses of the resulting data were performed in R version xx (ref to Zenodo). 
 
 ### Creating initial communities 
 First, the subcommunities were initialized in the modelled landscape. We created a 2-dimensional lattice of 20 x 20 cells with continuous boundaries, where each cell contained a subcommunity consisting of 1,000 individuals. Each subcommunity started with one individual per species of species S1 to S1,000. Each timestep, every individual was able to disperse within its own or to a neighboring subcommunity and replace another individual. The Euclidean distance between cells determined the probability that an individual from subcommunity j could replace an individual in subcommunity i (Fig. S1). To limit matrix sizes and thereby increase computation speed, dispersal was limited to the closest 121 cells (within the ranges -5 ≤ Δxij ≤ 5 and -5 ≤ Δyij ≤ 5, where Δxij and Δyij are the distances (in numbers of patches) in x and y directions between the focal subcommunity i and its neighbor j). For each of these 121 cells surrounding (and including) a focal subcommunity, the probability to disperse here was calculated using a 2-dimensional exponential probability density function: 
