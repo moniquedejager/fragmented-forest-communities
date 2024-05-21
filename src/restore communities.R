@@ -1,6 +1,16 @@
 # Restore communities.R
 # this script is not finished! It is a copy of fragment communities.R
 
+n_ind = 1000
+Pm_range = 0.5
+clustering = 1
+sim_nr = 1
+mutation_rate = 0.0001
+max_mutation = 0.05
+f_loss = 0.9
+hab_cover = 0.3
+clustering_restored = 1
+
 restore_community <- function(n_ind, 
                               Pm_range,
                               clustering, 
@@ -49,7 +59,7 @@ restore_community <- function(n_ind,
   landscape  <- read.table(filename, header=TRUE)
   
   filename   <- paste('./results/community_composition/',
-                    rv$clustering,'_',sim_nr, '_',(1 - f_loss)*100, 
+                    rv$clustering,'_',sim_nr, '_',f_loss*100, 
                     '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
   a          <- as.vector(as.matrix(read.table(filename)))
   a2         <- as.numeric(unlist(strsplit(a, '-'))[(1:(length(a)))*2 - 1])
