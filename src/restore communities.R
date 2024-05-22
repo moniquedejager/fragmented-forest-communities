@@ -1,15 +1,15 @@
 # Restore communities.R
 # this script is not finished! It is a copy of fragment communities.R
 
-#n_ind = 1000
-#Pm_range = 0.5
-#clustering = 1
-#sim_nr = 1
-#mutation_rate = 0.0001
-#max_mutation = 0.05
-#f_loss = 0.9
-#hab_cover = 0.3
-#clustering_restored = 1
+n_ind = 1000
+Pm_range = 0.5
+clustering = 1
+sim_nr = 1
+mutation_rate = 0.0001
+max_mutation = 0.05
+f_loss = 0.6
+hab_cover = 0.95
+clustering_restored = 5
 
 restore_community <- function(n_ind, 
                               Pm_range,

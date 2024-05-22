@@ -19,11 +19,16 @@ simulate_community_dynamics <- function(rv){
                                        rv$y == round(rv$ny/2)]
   rv$iteration_nr <- 0
   p               <- 0
-  while (p < 5){
+  while (p < 50){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- sort(rep(rv$comm_ID, rv$n_ind)) 
     for (i in 1:50){
       #print(paste('Working on iteration ', i))
+      #df <- data.frame(x=rv$x,
+      #                 y=rv$y,
+      #                 nspec = rv$nspecies,
+      #                 mPm   = tapply(rv$Pm, rv$comm_ID2, mean))
+      #print(ggplot(df, aes(x=x, y=y, fill=mPm)) + geom_raster())
       
       rv$origin_ID_t1 <- sort(rep(rv$comm_ID, rv$n_ind)) 
       # we let each individual reproduce and disperse to a subcommunity:
@@ -52,7 +57,8 @@ simulate_community_dynamics <- function(rv){
       
       # and in a random order (otherwise, the last individual always replaces 
       # an earlier dispersing individual)
-      a <- sample((1:rv$tot2), rv$tot2, replace=F)
+      sel <- rv$species > 0
+      a <- sample((1:rv$tot2)[sel], sum(sel), replace=F)
       
       spec     <- rv$species
       ind_id   <- ((r_commID - 1) * rv$n_ind + r_ind)      
@@ -94,6 +100,7 @@ simulate_community_dynamics <- function(rv){
     }
     end_time <- Sys.time()
     print(end_time - start_time)
+    print(table(rv$Pm))
     
     x <- 1:50
     s <- summary(lm(mean_nspecies[length(mean_nspecies) - 49:0]~x))
