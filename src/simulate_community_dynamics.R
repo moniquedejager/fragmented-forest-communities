@@ -38,7 +38,7 @@ simulate_community_dynamics <- function(rv){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
-      print(round(table(rv$Pm)/(rv$n*rv$n_ind), 2))
+      #print(round(table(rv$Pm)/(rv$n*rv$n_ind), 2))
       #print(paste('Working on iteration ', i))
       #df <- data.frame(x=rv$x,
       #                 y=rv$y,
@@ -50,44 +50,47 @@ simulate_community_dynamics <- function(rv){
       # all individuals to replace the old generation. Weights are based on the
       # dispersal capacity of the individuals and their distance to the subcom-
       # munity. 
-      id_replacement_all <- 1:length(rv$x2)
-      for (subcom in rv$comm_ID[rv$comm_type == 'sub']){
-        dx <- abs(rv$x - rv$x[rv$comm_ID == subcom])
-        dy <- abs(rv$y - rv$y[rv$comm_ID == subcom])
-        # continuous boundaries:
-        dx[dx > rv$nx/2] <- rv$nx - dx[dx > rv$nx/2]
-        dy[dy > rv$ny/2] <- rv$ny - dy[dy > rv$ny/2]
-        dist <- sqrt(dx^2 + dy^2)
-        dist <- unlist(lapply(dist, function(x) 
-          rep(x, rv$n_ind)))
-        
-        sel <- (rv$species > 0)&(dist < 5)
-        ids <- (1:length(rv$x2))[sel]
-        Pm  <- (2*pi*rv$Pm[sel]^2)^-1 * 
-          exp(-1*dist[sel]/rv$Pm[sel])*rv$Pm_C[rv$Pm[sel]/0.05] 
-        
-        id_replacement <- sample(ids, 
-                                 rv$n_ind, 
-                                 prob = Pm, 
-                                 replace = TRUE)
-        id_replacement_all[rv$comm_ID2 == subcom] <- id_replacement
-      }
+      id_replacement <- sapply(rv$comm_ID[rv$comm_type == 'sub'], 
+                               function(subcom){
+                                 dx <- abs(rv$x - rv$x[rv$comm_ID == subcom])
+                                 dy <- abs(rv$y - rv$y[rv$comm_ID == subcom])
+                                 # continuous boundaries:
+                                 dx[dx > rv$nx/2] <- rv$nx - dx[dx > rv$nx/2]
+                                 dy[dy > rv$ny/2] <- rv$ny - dy[dy > rv$ny/2]
+                                 dist <- sqrt(dx^2 + dy^2)
+                                 dist <- unlist(lapply(dist, function(x) 
+                                   rep(x, rv$n_ind)))
+                                 
+                                 sel <- (rv$species > 0)&(dist < 5)
+                                 ids <- (1:length(rv$x2))[sel]
+                                 Pm  <- (2*pi*rv$Pm[sel]^2)^-1 * 
+                                   exp(-1*dist[sel]/rv$Pm[sel])*rv$Pm_C[rv$Pm[sel]/0.05] 
+                                 
+                                 id_replacement <- sample(ids, 
+                                                          rv$n_ind, 
+                                                          prob = Pm, 
+                                                          replace = TRUE)
+                                 return(id_replacement)
+                               })
+      id_replacement_all <- as.vector(id_replacement)
+      
       new_species  <- rv$species[id_replacement_all]
       new_Pm       <- rv$Pm[id_replacement_all]
       origin_ID_t1 <- rv$comm_ID2[id_replacement_all]
       origin_ID_t50<- rv$origin_ID_t50[id_replacement_all]
       
-      rv$species       <- new_species
-      rv$Pm            <- new_Pm
-      rv$origin_ID_t1  <- origin_ID_t1
-      rv$origin_ID_t50 <- origin_ID_t50
-      
+      rv$species[rv$comm_type2 == 'sub']       <- new_species
+      rv$Pm[rv$comm_type2 == 'sub']            <- new_Pm
+      rv$origin_ID_t1[rv$comm_type2 == 'sub']  <- origin_ID_t1
+      rv$origin_ID_t50[rv$comm_type2 == 'sub'] <- origin_ID_t50
+ 
       # add mutations:
       mutated             <- (runif(length(rv$species), 0, 1) < rv$mutation_rate)*1
       mutated[rv$species == 0] <- 0
       if (sum(mutated) > 0){
         new_species         <- max(rv$species) + 1:sum(mutated)
-        new_Pm              <- rv$Pm[mutated == 1] + sample(seq((-1*rv$max_mutation),rv$max_mutation, 0.05), sum(mutated), replace=TRUE) 
+        #new_Pm              <- rv$Pm[mutated == 1] + sample(seq((-1*rv$max_mutation),rv$max_mutation, 0.05), sum(mutated), replace=TRUE) 
+        new_Pm              <- rv$Pm[mutated == 1] + runif(sum(mutated), -1*rv$max_mutation,rv$max_mutation) 
         new_Pm[new_Pm < 0.05] <- 0.05
         
         rv$species[mutated == 1] <- new_species
@@ -100,7 +103,7 @@ simulate_community_dynamics <- function(rv){
     }
     end_time <- Sys.time()
     print(end_time - start_time)
-    print(table(rv$Pm))
+    print(round(hist(rv$Pm, breaks = seq(-0.025, 1.025, 0.05))$counts / (rv$n*rv$n_ind), 3))
     
     x <- 1:50
     s <- summary(lm(mean_nspecies[length(mean_nspecies) - 49:0]~x))
