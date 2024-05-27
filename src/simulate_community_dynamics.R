@@ -5,19 +5,19 @@ simulate_community_dynamics <- function(rv){
   # the number of species stabilizes:
   ###################################################################
     
+  source('src/record.R')
   print(table(rv$Pm))
   
   calc_n_spec <- function(x) {
     spec <- rv$species[x*rv$n_ind - (1:rv$n_ind) + 1]
     length(unique(spec[spec > 0]))
   } 
-  
-  # per cell, select one of the subcommunities (or the metacommunity) 
-  # closest to this distance
-  mean_nspecies        <- vector(length=0)
+
+  mean_nspecies   <- vector(length=0)
   rv$iteration_nr <- 0
   p               <- 0
-  while (p < 50){
+  q               <- 0
+  while ((p < 5)&(q < rv$n_iterations)){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
@@ -91,8 +91,15 @@ simulate_community_dynamics <- function(rv){
     
     x <- 1:50
     s <- summary(lm(mean_nspecies[length(mean_nspecies) - 49:0]~x))
-    if (s$coefficients[2,4] > 0.05) { p <- p + 1 }
+    
+    if (rv$simulation_type == 'Fragmentation') {
+      q <- q + 1
+    } else {
+      if (s$coefficients[2,4] > 0.05) { p <- p + 1 }
+    }
     rv$iteration_nr <- rv$iteration_nr + 50
+    
+    record(rv)
   }
   return(rv)
 } 
