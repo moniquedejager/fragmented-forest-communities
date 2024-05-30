@@ -14,6 +14,7 @@ simulate_community_dynamics <- function(rv){
   } 
 
   mean_nspecies   <- vector(length=0)
+  total_species   <- vector(length=0)
   rv$iteration_nr <- 0
   p               <- 0
   q               <- 0
@@ -47,7 +48,16 @@ simulate_community_dynamics <- function(rv){
       
       # and in a random order (otherwise, the last individual always replaces 
       # an earlier dispersing individual)
-      sel <- rv$species > 0
+      p_disperse <- vector(length=0)
+      for (j in 1:rv$n){
+        spec <- rv$species[rv$comm_ID2 == j]
+        h <- hist(spec, breaks=-1:max(spec)+0.5, plot=FALSE)
+        n <- h$counts[spec+1]
+        
+        p_disperse <- c(p_disperse, 1/n)
+      }
+      
+      sel <- (rv$species > 0)&(p_disperse > runif(rv$n*rv$n_ind))
       a <- sample((1:rv$tot2)[sel], sum(sel), replace=F)
 
       spec     <- rv$species
@@ -81,21 +91,30 @@ simulate_community_dynamics <- function(rv){
         origin_ID_t1[a]
       
       rv$nspecies   <- sapply(rv$comm_ID, calc_n_spec)
-      mn            <- mean(rv$nspecies[rv$comm_type =='sub'])
-      mean_nspecies <- c(mean_nspecies, mn)
     }
     end_time <- Sys.time()
     print(end_time - start_time)
-    h <- hist(rv$Pm[rv$comm_type2 == 'sub'], breaks = seq(-0.025, 1.025, 0.05))
-    print(round(h$counts / sum(h$counts), 3))
     
-    x <- 1:50
-    s <- summary(lm(mean_nspecies[length(mean_nspecies) - 49:0]~x))
+    mn            <- mean(rv$nspecies[rv$comm_type =='sub'])
+    mean_nspecies <- c(mean_nspecies, mn)
+    total_species <- c(total_species, length(unique(rv$species)))
+    
+    #h <- hist(rv$Pm[rv$comm_type2 == 'sub'], breaks = seq(-0.025, 1.025, 0.05))
+    #print(round(h$counts / sum(h$counts), 3))
+    plot(total_species)
     
     if (rv$simulation_type == 'Fragmentation') {
       q <- q + 1
     } else {
-      if (s$coefficients[2,4] > 0.05) { p <- p + 1 }
+      if (length(mean_nspecies) > 4){
+        x <- 1:5
+        s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
+        s2 <- summary(lm(mean_nspecies[length(total_species) - 4:0]~x))
+        if ((s$coefficients[2,4] > 0.05) & 
+            (s2$coefficients[2,4] > 0.05)) { 
+          p <- p + 1 
+        }
+      }
     }
     rv$iteration_nr <- rv$iteration_nr + 50
     
