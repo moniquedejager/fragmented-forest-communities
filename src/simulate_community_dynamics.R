@@ -91,6 +91,7 @@ simulate_community_dynamics <- function(rv){
         origin_ID_t1[a]
       
       rv$nspecies   <- sapply(rv$comm_ID, calc_n_spec)
+      record(rv)
     }
     end_time <- Sys.time()
     print(end_time - start_time)
@@ -118,7 +119,7 @@ simulate_community_dynamics <- function(rv){
     }
     rv$iteration_nr <- rv$iteration_nr + 50
     
-    record(rv)
+    #record(rv)
   }
   return(rv)
 } 
