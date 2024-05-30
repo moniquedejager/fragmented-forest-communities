@@ -2,14 +2,15 @@ calc_dissimilarity <- function(rv){
   # Calculate the Bray-Curtis dissimilarity between subcommunities
   df2 <- matrix(rv$species, rv$n_ind,)
   
-  filename  <- paste('./results/landscapes/landscapes_',
-                     rv$sim_nr, '_', rv$clustering, '.txt', sep='')
-  landscape <- read.table(filename)
-  species   <- df2[,(landscape[,20]==1)]
+  # select 20 random subcommunities:
+  sel <- rv$comm_ID %in% sample(rv$comm_ID[rv$comm_type == 'sub'], 20, 
+                                 replace = FALSE)
+  
+  species   <- df2[,sel]
   
   # Euclidian distance between the subpopulations:
-  x <- rv$x[landscape[,20] == 1]
-  y <- rv$y[landscape[,20] == 1]
+  x <- rv$x[sel]
+  y <- rv$y[sel]
   
   n <- length(x)
   i  <- rep(1, (n-1))

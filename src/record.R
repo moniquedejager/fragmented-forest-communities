@@ -16,12 +16,13 @@ record <- function(rv){
                      n_iterations        = rv$n_iterations, 
                      simulation_type     = rv$simulation_type,
                      iteration_nr        = rv$iteration_nr,
-                     m_species           = mean(rv$nspecies),
-                     total_species       = length(unique(rv$species)),
-                     f_t1_same_subcom    = mean(rv$comm_ID2 == rv$origin_ID_t1),
-                     f_t50_same_subcom   = mean(rv$comm_ID2 == rv$origin_ID_t50),
-                     m_Pm                = mean(rv$Pm))
-  
+                     m_species           = mean(rv$nspecies[rv$comm_type == 'sub']),
+                     total_species       = length(unique(rv$species[rv$species > 0])),
+                     f_t1_same_subcom    = mean(rv$comm_ID2[rv$comm_type2 == 'sub'] 
+                                                == rv$origin_ID_t1[rv$comm_type2 == 'sub']),
+                     f_t50_same_subcom   = mean(rv$comm_ID2[rv$comm_type2 == 'sub'] 
+                                                == rv$origin_ID_t50[rv$comm_type2 == 'sub']),
+                     m_Pm                = mean(rv$Pm[rv$comm_type2 == 'sub']))
   
   filename <- paste('results/data per iteration/sim_nr=', rv$sim_nr, 
                     'clustering=', rv$clustering,

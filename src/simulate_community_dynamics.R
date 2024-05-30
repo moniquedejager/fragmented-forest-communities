@@ -6,6 +6,7 @@ simulate_community_dynamics <- function(rv){
   ###################################################################
     
   source('src/record.R')
+  source('src/write_data_to_files_fragmentation.R')
   print(table(rv$Pm))
   
   calc_n_spec <- function(x) {
@@ -17,8 +18,7 @@ simulate_community_dynamics <- function(rv){
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
   p               <- 0
-  q               <- 0
-  while ((p < 5)&(q < rv$n_iterations)){
+  while (p < 5){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
@@ -104,21 +104,21 @@ simulate_community_dynamics <- function(rv){
     #print(round(h$counts / sum(h$counts), 3))
     plot(total_species)
     
-    if (rv$simulation_type == 'Fragmentation') {
-      q <- q + 1
-    } else {
-      if (length(mean_nspecies) > 4){
-        x <- 1:5
-        s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
-        s2 <- summary(lm(mean_nspecies[length(total_species) - 4:0]~x))
-        if ((s$coefficients[2,4] > 0.05) & 
-            (s2$coefficients[2,4] > 0.05)) { 
-          p <- p + 1 
-        }
+    if (length(mean_nspecies) > 4){
+      x <- 1:5
+      s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
+      s2 <- summary(lm(mean_nspecies[length(total_species) - 4:0]~x))
+      if ((s$coefficients[2,4] > 0.05) & 
+          (s2$coefficients[2,4] > 0.05)) { 
+        p <- p + 1 
       }
     }
+    
     rv$iteration_nr <- rv$iteration_nr + 50
     
+    if (length(mean_nspecies) %in% ((1:10)*5)){
+      write_data_to_files_fragmentation(rv)
+    }
     #record(rv)
   }
   return(rv)
