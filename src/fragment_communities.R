@@ -58,7 +58,7 @@ fragment_community <- function(n_ind,
   
   # start with the pristine, unfragmented landscape, with the initial community: 
   m <- read.table('results/community_composition/initial_community.txt')
-  m <- as.vector(as.matrix(m))
+  m <- as.vector(t(as.matrix(m)))
   
   m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
   rv$species<- m2
@@ -87,7 +87,6 @@ fragment_community <- function(n_ind,
 
 
 
-
 # Install and load the future package
 # install.packages("future")
 library(future)
@@ -97,27 +96,21 @@ library(future.apply)
 dat <- expand.grid(n_ind = 1000, 
                    Pm_range = 0.5, 
                    clustering = c(1,3,5), 
-                   mutation_rate = 0.0001, 
+                   mutation_rate = 0, 
                    max_mutation = 0.05, 
                    sim_nr = 1,
-                   f_loss = round(seq(0.05, 0.95, 0.05), 2),
-                   hab_cover = round(seq(0.05, 0.95, 0.05), 2),
-                   clustering_restored = c(1, 3, 5))
-
-dat <- dat[round((1 - dat$f_loss),2) <= dat$hab_cover,]
+                   f_loss = round(seq(0.05, 0.95, 0.05), 2))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system
 
 result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) {
-  restore_community(dat$n_ind[i], 
+  fragment_community(dat$n_ind[i], 
                     dat$Pm_range[i], 
                     dat$clustering[i], 
                     dat$sim_nr[i], 
                     dat$mutation_rate[i],
                     dat$max_mutation[i],
-                    dat$f_loss[i],
-                    dat$hab_cover[i],
-                    dat$clustering_restored[i])
+                    dat$f_loss[i])
 }, future.seed = TRUE)
 

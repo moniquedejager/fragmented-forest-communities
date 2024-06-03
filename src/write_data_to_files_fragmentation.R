@@ -93,7 +93,7 @@ write_data_to_files_fragmentation <- function(rv){
                    n_species     = length(unique(rv$species[(rv$comm_type2 == 'sub')&(rv$species > 0)])),
                    n_iterations  = rv$iteration_nr)
   
-  filename <- paste('./results/simulation_data/restored_simulation_data_',
+  filename <- paste('./results/simulation_data/fragmented_simulation_data_',
                     rv$f_loss, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
@@ -114,7 +114,7 @@ write_data_to_files_fragmentation <- function(rv){
                          n_iterations  = rv$iteration_nr,
                          disp_cap      = disp,
                          perc_indiv    = p_disp)
-  filename <- paste('./results/dispersal_capacity/restored_dispersal capacity_data_',
+  filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_',
                     rv$f_loss, '.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
