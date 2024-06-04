@@ -10,7 +10,7 @@ clustering = 1
 sim_nr = 4
 mutation_rate = 0 #0.0001
 max_mutation = 0.05
-f_loss = 0
+f_loss = 0.05
 #hab_cover = 0.95
 #clustering_restored = 1
 

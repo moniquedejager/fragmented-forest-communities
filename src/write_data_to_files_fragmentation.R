@@ -125,14 +125,15 @@ write_data_to_files_fragmentation <- function(rv){
   # Record the composition of the subcommunities per simulation for use in 
   # the restoration model. (matrix of species numbers of all subcommunities 
   # x 1000 individuals).
-  df <- matrix(paste(rv$species, rv$Pm, sep='-'), rv$n,rv$n_ind)
+  df <- t(matrix(paste(rv$species, rv$Pm, sep='-'), rv$n_ind, rv$n))
   df <- df[rv$comm_type == 'sub',]
-  df <- cbind(rv$clustering, 
-              rv$sim_nr, 
-              rv$x[rv$comm_type == 'sub'], 
-              rv$y[rv$comm_type == 'sub'], 
-              rv$f_loss,
-              rv$iteration_nr,
+  df2 <- cbind(rv$clustering, 
+               rv$sim_nr, 
+               rv$x[rv$comm_type == 'sub'], 
+               rv$y[rv$comm_type == 'sub'], 
+               rv$f_loss,
+               rv$iteration_nr)
+  df <- cbind(df2,
               df)
   
   filename <- paste('./results/community_composition/',
