@@ -4,7 +4,7 @@
 # hypothesis: Euclidian distance between subpopulations is negatively related 
 # to similarity in community composition
 
-filename <- 'results/dissimilarity/dissimilarity_data_1.txt'
+filename <- 'results/dissimilarity/dissimilarity_data_2.txt'
 df <- read.table(filename, header = TRUE)
 
 df3 <- df[df$mu == 6,]

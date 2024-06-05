@@ -3,6 +3,7 @@ library(ggpubr)
 
 filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.5.txt'
 df <- read.table(filename, header = TRUE)
+df <- df[df$sim_nr == 2,]
 
 ix <- 1:length(df$mu)
 group <- paste(df$mu, df$x, df$y, sep='-')
@@ -13,6 +14,7 @@ for (i in seq(0.1, 0.95, 0.05)){
   filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
+    m  <- m[m$sim_nr == 2,]
     
     ix <- 1:length(m$mu)
     group <- paste(m$mu, m$x, m$y, sep='-')

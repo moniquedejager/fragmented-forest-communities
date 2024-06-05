@@ -10,7 +10,7 @@ clustering = 1
 sim_nr = 4
 mutation_rate = 0 #0.0001
 max_mutation = 0.05
-f_loss = 0.05
+f_loss = 0
 #hab_cover = 0.95
 #clustering_restored = 1
 
@@ -98,7 +98,7 @@ dat <- expand.grid(n_ind = 1000,
                    clustering = c(1,3,5), 
                    mutation_rate = 0, 
                    max_mutation = 0.05, 
-                   sim_nr = 1,
+                   sim_nr = 2,
                    f_loss = round(seq(0.05, 0.95, 0.05), 2))
 
 # Set up parallel processing with future
