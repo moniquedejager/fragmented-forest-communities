@@ -8,7 +8,7 @@ n_ind = 1000
 Pm_range = 0.5
 clustering = 1
 sim_nr = 4
-mutation_rate = 0 #0.0001
+mutation_rate = 0.01 #0.0001
 max_mutation = 0.05
 f_loss = 0
 #hab_cover = 0.95
@@ -57,12 +57,14 @@ fragment_community <- function(n_ind,
     rep(x, rv$n_ind)))
   
   # start with the pristine, unfragmented landscape, with the initial community: 
-  m <- read.table('results/community_composition/initial_community.txt')
-  m <- as.vector(t(as.matrix(m)))
+  #m <- read.table('results/community_composition/initial_community.txt')
+  #m <- as.vector(t(as.matrix(m)))
   
-  m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
-  rv$species<- m2
-  rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+  #m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
+  #rv$species<- m2
+  #rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+  rv$species <- rep(1:rv$n_ind, rv$n)
+  rv$Pm      <- ceiling(rv$species/(rv$n_ind/10))/10 * rv$Pm_range
   
   # we furthermore need to define the local neighborhood per cell
   rv$dx   <- rep(-5:5, 11)
@@ -78,8 +80,9 @@ fragment_community <- function(n_ind,
   rv$tot2     <- length(rv$x2)
   
   # now that we have a starting community, we can fragment the environment:
-  rv  <- fragment(rv)
-  rv$simulation_type <- 'Fragmentation'
+  #rv  <- fragment(rv)
+  #rv$simulation_type <- 'Fragmentation'
+  rv$simulation_type <- 'Test'
   rv  <- simulate_community_dynamics(rv)
   
   write_data_to_files_fragmentation(rv)
@@ -94,12 +97,13 @@ library(future.apply)
 
 # Create input vectors/lists
 dat <- expand.grid(n_ind = 1000, 
-                   Pm_range = 0.5, 
-                   clustering = c(1,3,5), 
-                   mutation_rate = 0, 
-                   max_mutation = 0.05, 
-                   sim_nr = 2,
-                   f_loss = round(seq(0.05, 0.95, 0.05), 2))
+                   Pm_range = c(0.5, 1), 
+                   clustering = 1, #c(1,3,5), 
+                   mutation_rate = c(0, 0.0001, 0.0003, 0.0005, 0.001, 0.003, 
+                                     0.005, 0.01, 0.03, 0.05, 0.1), 
+                   max_mutation = 0,  
+                   sim_nr = 1:10,
+                   f_loss = 0) #round(seq(0.05, 0.95, 0.05), 2))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system

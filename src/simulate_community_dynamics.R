@@ -48,16 +48,7 @@ simulate_community_dynamics <- function(rv){
       
       # and in a random order (otherwise, the last individual always replaces 
       # an earlier dispersing individual)
-      p_disperse <- vector(length=0)
-      for (j in 1:rv$n){
-        spec <- rv$species[rv$comm_ID2 == j]
-        h <- hist(spec, breaks=-1:max(spec)+0.5, plot=FALSE)
-        n <- h$counts[spec+1]
-        
-        p_disperse <- c(p_disperse, 1/n)
-      }
-      
-      sel <- (rv$species > 0)&(p_disperse > runif(rv$n*rv$n_ind))
+      sel <- (rv$species > 0)
       a <- sample((1:rv$tot2)[sel], sum(sel), replace=F)
 
       spec     <- rv$species
@@ -68,14 +59,16 @@ simulate_community_dynamics <- function(rv){
       rv$species <- spec
       rv$Pm      <- Pm
       
-      # add mutations:
+      # add mutations: (which are now incoming seeds from the metapopulation!)
       mutated                  <- runif(length(rv$species), 0, 1) < rv$mutation_rate
       mutated[rv$species == 0] <- 0
       if (sum(mutated) > 0){
-        new_species         <- max(rv$species) + 1:sum(mutated)
-        new_Pm              <- rv$Pm[mutated] + sample(seq((-1*rv$max_mutation),rv$max_mutation, 0.05), sum(mutated), replace=TRUE) 
-        new_Pm[new_Pm < 0.05] <- 0.05
-        
+        new_species         <- sample(1:rv$n_ind, 
+                                      sum(mutated), 
+                                      replace=TRUE, 
+                                      prob=ceiling((1:rv$n_ind)/(rv$n_ind/10))/10 * rv$Pm_range)
+        new_Pm              <- ceiling(new_species/(rv$n_ind/10))/10 * rv$Pm_range
+
         rv$species[mutated] <- new_species
         rv$Pm[mutated]      <- new_Pm
       }
@@ -90,7 +83,8 @@ simulate_community_dynamics <- function(rv){
       rv$origin_ID_t1[ind_id[a]] <- 
         origin_ID_t1[a]
       
-      rv$nspecies   <- sapply(rv$comm_ID, calc_n_spec)
+      rv$nspecies     <- sapply(rv$comm_ID, calc_n_spec)
+      rv$iteration_nr <- rv$iteration_nr + 1
       record(rv)
     }
     end_time <- Sys.time()
@@ -107,19 +101,16 @@ simulate_community_dynamics <- function(rv){
     if (length(mean_nspecies) > 4){
       x <- 1:5
       s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
-      s2 <- summary(lm(mean_nspecies[length(total_species) - 4:0]~x))
+      s2 <- summary(lm(total_species[length(total_species) - 4:0]~x))
       if ((s$coefficients[2,4] > 0.05) & 
           (s2$coefficients[2,4] > 0.05)) { 
         p <- p + 1 
       }
     }
     
-    rv$iteration_nr <- rv$iteration_nr + 50
-    
     if (length(mean_nspecies) %in% ((1:10)*5)){
-      write_data_to_files_fragmentation(rv)
+      #write_data_to_files_fragmentation(rv)
     }
-    #record(rv)
   }
   return(rv)
 } 
