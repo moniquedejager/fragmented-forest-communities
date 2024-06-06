@@ -102,8 +102,11 @@ simulate_community_dynamics <- function(rv){
       x <- 1:5
       s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
       s2 <- summary(lm(total_species[length(total_species) - 4:0]~x))
-      if ((s$coefficients[2,4] > 0.05) & 
-          (s2$coefficients[2,4] > 0.05)) { 
+      Pr <- c(s$coefficients[2,4], s2$coefficients[2,4])
+      Pr[is.na(Pr)] <- 1
+      
+      if ((Pr[1] > 0.05) & 
+          (Pr[2] > 0.05)) { 
         p <- p + 1 
       }
     }
