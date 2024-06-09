@@ -21,7 +21,8 @@ record <- function(rv){
   
   filename <- paste('results/data per iteration/sim_nr=', rv$sim_nr, 
                     'clustering=', rv$clustering,
-                    'f_loss=', rv$f_loss, '.txt', sep='')
+                    'f_loss=', rv$f_loss, 
+                    'mutation_rate=',rv$mutation_rate,'.txt', sep='')
   if (file.exists(filename)){
     write.table(data, filename, append = TRUE, col.names = FALSE, row.names = FALSE)
   } else {
