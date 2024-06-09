@@ -18,7 +18,8 @@ simulate_community_dynamics <- function(rv){
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
   p               <- 0
-  while (p < 5){
+  #while (p < 5){
+  while (rv$iteration_nr < 10001){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
@@ -85,10 +86,12 @@ simulate_community_dynamics <- function(rv){
       
       rv$nspecies     <- sapply(rv$comm_ID, calc_n_spec)
       rv$iteration_nr <- rv$iteration_nr + 1
-      record(rv)
+      
     }
     end_time <- Sys.time()
     print(end_time - start_time)
+    
+    record(rv)
     
     mn            <- mean(rv$nspecies[rv$comm_type =='sub'])
     mean_nspecies <- c(mean_nspecies, mn)
