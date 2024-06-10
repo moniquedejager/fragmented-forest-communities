@@ -4,11 +4,11 @@
 # nog in te verwerken: tijd tussen fragmentatie en restoratie
 # wegschrijven data per 50 iteraties
 
-n_ind = 1000
-Pm_range = 0.5
+n_ind = 10
+Pm_range = 1
 clustering = 1
 sim_nr = 4
-mutation_rate = 0.01 #0.0001
+mutation_rate = 0 #0.0001
 max_mutation = 0.05
 f_loss = 0
 #hab_cover = 0.95
@@ -89,8 +89,8 @@ fragment_community <- function(n_ind,
   
   rv$simulation_type <- 'Test_95'
   rv$f_loss <- 95
-  rv  <- simulate_community_dynamics(rv)
   rv  <- fragment(rv)
+  rv  <- simulate_community_dynamics(rv)
   write_data_to_files_fragmentation(rv)
 }
 
