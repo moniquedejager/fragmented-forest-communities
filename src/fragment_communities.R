@@ -82,9 +82,15 @@ fragment_community <- function(n_ind,
   # now that we have a starting community, we can fragment the environment:
   #rv  <- fragment(rv)
   #rv$simulation_type <- 'Fragmentation'
-  rv$simulation_type <- 'Test'
+  rv$simulation_type <- 'Test_0'
   rv  <- simulate_community_dynamics(rv)
   
+  write_data_to_files_fragmentation(rv)
+  
+  rv$simulation_type <- 'Test_95'
+  rv$f_loss <- 95
+  rv  <- simulate_community_dynamics(rv)
+  rv  <- fragment(rv)
   write_data_to_files_fragmentation(rv)
 }
 
@@ -100,7 +106,7 @@ dat <- expand.grid(n_ind = 1000,
                    Pm_range = 1, 
                    clustering = 1, #c(1,3,5), 
                    mutation_rate = c(0, 0.0001, 0.0003, 0.0005, 0.001, 0.003, 
-                                     0.005, 0.01, 0.03, 0.05, 0.1), 
+                                     0.005, 0.01, 0.03, 0.05), 
                    max_mutation = 0,  
                    sim_nr = 1,
                    f_loss = 0) #round(seq(0.05, 0.95, 0.05), 2))
