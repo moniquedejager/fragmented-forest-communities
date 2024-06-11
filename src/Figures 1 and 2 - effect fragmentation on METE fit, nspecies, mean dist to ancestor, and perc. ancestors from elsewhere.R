@@ -1,31 +1,28 @@
 library(ggplot2)
 library(ggpubr)
 
-filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.5.txt'
+filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.txt'
 df <- read.table(filename, header = TRUE)
-df <- df[df$sim_nr == 2,]
-
-ix <- 1:length(df$mu)
-group <- paste(df$mu, df$x, df$y, sep='-')
-ix <- tapply(ix, group, max)
-df2 <- df[ix,]
+df <- df[df$mutation_rate == 0.0003,]
+df2 <- df
+df2$mu <- 3
+df3 <- df
+df3$mu <- 5
+df <- rbind(df, df2, df3)
 
 for (i in seq(0.1, 0.95, 0.05)){
   filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
-    m  <- m[m$sim_nr == 2,]
     
-    ix <- 1:length(m$mu)
-    group <- paste(m$mu, m$x, m$y, sep='-')
-    ix <- tapply(ix, group, max)
-    df <- rbind(df, m[ix,])
+    df <- rbind(df, m)
   }
 }
 
-#df$METE_fit[df$METE_fit < 0] <- 0
+df <- df[df$mutation_rate == 0.0003,]
+df <- df[df$f_loss > 0,]
+df$METE_fit[df$METE_fit < 0] <- 0
 df$Pm <- 1 - df$Pm
-#df$Shannon <- df$Shannon / log(df$n_species)
 
 # with geom_raster:
 group <- paste(df$f_loss, df$mu, sep='-')
@@ -41,9 +38,8 @@ df3   <- data.frame(frag     = vector(length = 0),
 brks <- (0:22)/20 - 0.05
 
 for (i in unique(group)){
-  
-  fit_hist      <- hist(df$METE_fit[(group == i)], breaks = (brks * 12 - 11.8))
-  nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 500)
+  fit_hist      <- hist(df$METE_fit[(group == i)], breaks = (brks * 1))
+  nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 100)
   Pm_hist       <- hist(df$Pm[(group == i)], breaks = brks * 1)
 
   df3b   <- data.frame(frag    = df$f_loss[(group == i)][1],
@@ -70,10 +66,6 @@ df4 <- data.frame(frag = rep(df3$frag, 3),
                   type = c(rep("METE's fit to SAD", length(df3$frag)),
                            rep('# Species per subcommunity', length(df3$frag)),
                            rep("% Ancestors from elsewhere", length(df3$frag))))
-
-df4$mu2              <- "μ = 1"
-df4$mu2[df4$mu == 3] <- "μ = 3"
-df4$mu2[df4$mu == 5] <- "μ = 5"
 
 df4$z2             <- df4$z
 df4$z2[df4$z == 0] <- NA

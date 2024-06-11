@@ -4,7 +4,7 @@
 # hypothesis: Euclidian distance between subpopulations is negatively related 
 # to similarity in community composition
 
-filename <- 'results/dissimilarity/dissimilarity_data_2.txt'
+filename <- 'results/dissimilarity/dissimilarity_data_1.txt'
 df <- read.table(filename, header = TRUE)
 
 df3 <- df[df$mu == 6,]
@@ -32,10 +32,10 @@ df2$clustering[df2$mu == 5] <- 'Clustered'
 ggplot(df2, aes(x=f_hab_loss, y=dissimilarity, fill=z/190)) + 
   geom_tile() + 
   facet_grid(cols=vars(clustering)) + 
-  scale_fill_gradientn(colors = c('lightyellow','yellow', 'seagreen', 
+  scale_fill_gradientn(colors = c('white','lightyellow','yellow', 'seagreen', 
                                   'darkcyan', 'midnightblue', 'black'),
                        labels = scales::percent_format(),
-                       limits=c(1/190, 0.5),
+                       limits=c(1/190, 1),
                        na.value = 'white',
                        trans = 'log10',
                        name="% Subcommunity pairs") +
