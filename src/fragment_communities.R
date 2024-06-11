@@ -57,14 +57,14 @@ fragment_community <- function(n_ind,
     rep(x, rv$n_ind)))
   
   # start with the pristine, unfragmented landscape, with the initial community: 
-  m <- read.table('results/community_composition/initial_community.txt')
-  m <- as.vector(t(as.matrix(m)))
+  #m <- read.table('results/community_composition/initial_community.txt')
+  #m <- as.vector(t(as.matrix(m)))
   
-  m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
-  rv$species<- m2
-  rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
-  #rv$species <- rep(1:rv$n_ind, rv$n)
-  #rv$Pm      <- ceiling(rv$species/(rv$n_ind/10))/10 * rv$Pm_range
+  #m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
+  #rv$species<- m2
+  #rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+  rv$species <- rep(1:rv$n_ind, rv$n)
+  rv$Pm      <- rep(rv$Pm_range, rv$n*rv$n_ind)
   
   # we furthermore need to define the local neighborhood per cell
   rv$dx   <- rep(-5:5, 11)
@@ -80,8 +80,9 @@ fragment_community <- function(n_ind,
   rv$tot2     <- length(rv$x2)
   
   # now that we have a starting community, we can fragment the environment:
-  rv  <- fragment(rv)
-  rv$simulation_type <- 'Fragmentation'
+  #rv  <- fragment(rv)
+  #rv$simulation_type <- 'Fragmentation'
+  rv$simulation_type <- 'Initialization'
   rv  <- simulate_community_dynamics(rv)
   
   write_data_to_files_fragmentation(rv)
@@ -99,10 +100,10 @@ dat <- expand.grid(n_ind = 1000,
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
                    sim_nr = 1,
-                   f_loss = round(seq(0.05, 0.95, 0.05), 2))
+                   f_loss = 0)#round(seq(0.05, 0.95, 0.05), 2))
 
 # Set up parallel processing with future
-plan(multisession, workers = 10)  # Adjust the number of workers based on your system
+plan(multisession, workers = 3)  # Adjust the number of workers based on your system
 
 result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) {
   fragment_community(dat$n_ind[i], 

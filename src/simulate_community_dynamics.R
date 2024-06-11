@@ -66,12 +66,9 @@ simulate_community_dynamics <- function(rv){
       if (sum(mutated) > 0){
         new_species         <- sample(1:rv$n_ind, 
                                       sum(mutated), 
-                                      replace=TRUE, 
-                                      prob=(ceiling((1:rv$n_ind)/(rv$n_ind/10))/10 * rv$Pm_range))
-        new_Pm              <- ceiling(new_species/(rv$n_ind/10))/10 * rv$Pm_range
+                                      replace=TRUE)
 
         rv$species[mutated==1] <- new_species
-        rv$Pm[mutated==1]      <- new_Pm
       }
       rv$species[rv$comm_type2 != 'sub'] <- 0
       rv$Pm[rv$comm_type2 != 'sub'] <- 0
