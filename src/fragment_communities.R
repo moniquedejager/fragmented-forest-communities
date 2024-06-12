@@ -103,7 +103,7 @@ dat <- expand.grid(n_ind = 1000,
                    f_loss = round(seq(0.05, 0.95, 0.05), 2))
 
 # Set up parallel processing with future
-plan(multisession, workers = 3)  # Adjust the number of workers based on your system
+plan(multisession, workers = 10)  # Adjust the number of workers based on your system
 
 result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) {
   fragment_community(dat$n_ind[i], 

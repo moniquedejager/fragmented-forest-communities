@@ -4,23 +4,15 @@
 # hypothesis: Euclidian distance between subpopulations is negatively related 
 # to similarity in community composition
 
-filename <- 'results/simulation results 04-2024/dissimilarity/dissimilarity_data_1similar_dispersal.txt'
+filename <- 'results/simulation results different dispersal 20240611/dissimilarity/dissimilarity_data_1.txt'
 df <- read.table(filename, header = TRUE)
+df$dispersal_type <- 2
+df <- df[(df$f_hab_loss > 0)&(df$mutation_rate == 0.0003),]
 
-for (i in 2:10){
-  filename <- paste('results/simulation results 04-2024/dissimilarity/dissimilarity_data_', i, 'similar_dispersal.txt', sep='')
-  df2 <- read.table(filename, header = TRUE)
-  df  <- rbind(df, df2)
-}
-n <- length(df$mu)
-
-for (i in 1:10){
-  filename <- paste('results/simulation results 04-2024/dissimilarity/dissimilarity_data_', i, '.txt', sep='')
-  df2 <- read.table(filename, header = TRUE)
-  df  <- rbind(df, df2)
-}
-
-df$dispersal_type <- c(rep(1, n), rep(2, n))
+filename <- 'results/simulation results similar dispersal 20240612/dissimilarity/dissimilarity_data_1.txt'
+df2 <- read.table(filename, header = TRUE)
+df2$dispersal_type <- 1
+df  <- rbind(df, df2)
 
 # plot using geom_raster:
 df$diss2 <- round(df$dissimilarity, 2)
