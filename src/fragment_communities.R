@@ -10,7 +10,8 @@ clustering = 1
 sim_nr = 4
 mutation_rate = 0 #0.0001
 max_mutation = 0.05
-f_loss = 0
+f_loss = 0.5
+dispersal = 'similar' # similar or different dispersal strategies
 #hab_cover = 0.95
 #clustering_restored = 1
 
@@ -20,7 +21,8 @@ fragment_community <- function(n_ind,
                               sim_nr, 
                               mutation_rate, 
                               max_mutation,
-                              f_loss){
+                              f_loss,
+                              dispersal){
   library(ggplot2)
   source('src/simulate_community_dynamics.R')
   source('src/fragment.R')
@@ -36,7 +38,8 @@ fragment_community <- function(n_ind,
              clustering = clustering,
              mutation_rate = mutation_rate,
              max_mutation  = max_mutation,
-             f_loss        = f_loss)
+             f_loss        = f_loss,
+             dispersal     = dispersal)
              #hab_cover     = hab_cover,
              #clustering_restored = clustering_restored,
  
@@ -56,15 +59,19 @@ fragment_community <- function(n_ind,
   rv$comm_ID2   <- unlist(lapply(rv$comm_ID, function(x) 
     rep(x, rv$n_ind)))
   
-  # start with the pristine, unfragmented landscape, with the initial community: 
-  m <- read.table('results/community_composition/initial_community.txt')
-  m <- as.vector(t(as.matrix(m)))
-  
-  #m2        <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
-  rv$species<- m
-  #rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
-  #rv$species <- rep(1:rv$n_ind, rv$n)
-  rv$Pm      <- rep(rv$Pm_range, rv$n*rv$n_ind)
+  # start with the pristine, unfragmented landscape, with the initial community:
+  if (dispersal == 'similar'){
+    m <- read.table('results/community_composition/initial_community_sim.txt')
+    m <- as.vector(t(as.matrix(m)))
+    rv$species <- m
+    rv$Pm      <- rep(rv$Pm_range, rv$n*rv$n_ind)
+  } else {
+    m <- read.table('results/community_composition/initial_community_dif.txt')
+    m <- as.vector(t(as.matrix(m)))
+    m2  <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
+    rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+    rv$species <- rep(1:rv$n_ind, rv$n)
+  }
   
   # we furthermore need to define the local neighborhood per cell
   rv$dx   <- rep(-5:5, 11)
@@ -100,7 +107,8 @@ dat <- expand.grid(n_ind = 1000,
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
                    sim_nr = 1,
-                   f_loss = round(seq(0.05, 0.95, 0.05), 2))
+                   f_loss = round(seq(0.05, 0.95, 0.05), 2),
+                   dispersal = c('similar', 'different'))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system
@@ -112,6 +120,7 @@ result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) 
                     dat$sim_nr[i], 
                     dat$mutation_rate[i],
                     dat$max_mutation[i],
-                    dat$f_loss[i])
+                    dat$f_loss[i],
+                    dat$dispersal[i])
 }, future.seed = TRUE)
 

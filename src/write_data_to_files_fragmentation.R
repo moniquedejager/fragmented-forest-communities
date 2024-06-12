@@ -50,6 +50,7 @@ write_data_to_files_fragmentation <- function(rv){
                    max_mutation  = rv$max_mutation,
                    f_loss     = rv$f_loss,
                    n_iteration = rv$iteration_nr,
+                   dispersal  = rv$dispersal,
                    x          = rv$x[rv$comm_type == 'sub'],
                    y          = rv$y[rv$comm_type == 'sub'],
                    n_species  = rv$nspecies[rv$comm_type == 'sub'],
@@ -72,6 +73,7 @@ write_data_to_files_fragmentation <- function(rv){
                    n_iterations  = rv$iteration_nr,
                    mutation_rate = rv$mutation_rate,
                    max_mutation  = rv$max_mutation,
+                   dispersal     = rv$dispersal,
                    distance      = dissimilarity[,1],
                    dissimilarity = dissimilarity[,2])
   filename <- paste('./results/dissimilarity/dissimilarity_data_',
@@ -88,10 +90,12 @@ write_data_to_files_fragmentation <- function(rv){
                    mutation_rate = rv$mutation_rate,
                    max_mutation  = rv$max_mutation,
                    f_loss        = rv$f_loss,
+                   dispersal     = rv$dispersal,
                    m_nspecies    = mean(rv$nspecies[rv$comm_type == 'sub']),
                    m_METE_fit    = mean(fit),
                    n_species     = length(unique(rv$species[(rv$comm_type2 == 'sub')&(rv$species > 0)])),
-                   n_iterations  = rv$iteration_nr)
+                   n_iterations  = rv$iteration_nr,
+                   static_n_species = rv$static_n_species)
   
   filename <- paste('./results/simulation_data/fragmented_simulation_data_',
                     rv$f_loss, '.txt', sep='')
@@ -112,6 +116,7 @@ write_data_to_files_fragmentation <- function(rv){
                          max_mutation  = rv$max_mutation,
                          f_loss        = rv$f_loss,
                          n_iterations  = rv$iteration_nr,
+                         dispersal     = rv$dispersal,
                          disp_cap      = disp,
                          perc_indiv    = p_disp)
   filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_',
@@ -136,7 +141,7 @@ write_data_to_files_fragmentation <- function(rv){
   df <- cbind(df2,
               df)
   
-  filename <- paste('./results/community_composition/',
+  filename <- paste('./results/community_composition/', rv$dispersal,
                     rv$clustering,'_',rv$sim_nr, '_',rv$f_loss, 
                     '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
   write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)

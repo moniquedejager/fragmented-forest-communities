@@ -13,6 +13,7 @@ record <- function(rv){
                      f_loss              = rv$f_loss,
                      simulation_type     = rv$simulation_type,
                      iteration_nr        = rv$iteration_nr,
+                     dispersal           = rv$dispersal,
                      m_species           = mean(rv$nspecies[rv$comm_type == 'sub']),
                      total_species       = length(unique(rv$species[rv$species > 0])),
                      f_t50_same_subcom   = mean(rv$comm_ID2[rv$comm_type2 == 'sub'] 

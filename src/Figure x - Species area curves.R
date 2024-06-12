@@ -1,7 +1,7 @@
 # Species-area curves:
 library(ggplot2)
 library(ggpubr)
-source('./src 03-2024/summarySE.R')
+source('./src/summarySE.R')
 
 df <- data.frame(clustering = vector(length=0),
                  sim_nr = vector(length=0),
@@ -13,7 +13,7 @@ df <- data.frame(clustering = vector(length=0),
                  dispersal_type = vector(length=0),
                  static_dynamic = vector(length=0))
 
-mutation_rate <- 0.0001
+mutation_rate <- 0.0003
 for (clustering in c(1, 3, 5)){
   for (sim_nr in 1:10){
     for (frag in seq(0, 95, 5)){
