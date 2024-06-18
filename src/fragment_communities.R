@@ -106,7 +106,7 @@ dat <- expand.grid(n_ind = 1000,
                    clustering = c(1,3,5), 
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
-                   sim_nr = 1,
+                   sim_nr = 1:10,
                    f_loss = round(seq(0.05, 0.95, 0.05), 2),
                    dispersal = c('similar', 'different'))
 

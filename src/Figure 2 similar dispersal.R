@@ -1,27 +1,13 @@
 library(ggplot2)
 library(ggpubr)
 
-filename <- 'results/simulation results different dispersal 20240611/subcommunity_data/fragmented_subcommunity_data_0.05.txt'
+filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.05.txt'
 df <- read.table(filename, header = TRUE)
-df <- df[df$mutation_rate == 0.0003,]
-df$dispersal_type <- 'Different dispersal strategies'
 
 for (i in seq(0.1, 0.95, 0.05)){
-  filename <- paste('results/simulation results different dispersal 20240611/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
+  filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
-    m <- m[m$mutation_rate == 0.0003,]
-    m$dispersal_type <- 'Different dispersal strategies'
-    df <- rbind(df, m)
-  }
-}
-
-for (i in seq(0, 0.95, 0.05)){
-  filename <-  paste('results/simulation results similar dispersal 20240612/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
-  if (file.exists(filename)){
-    m  <- read.table(filename, header = TRUE)
-    m <- m[m$mutation_rate == 0.0003,]
-    m$dispersal_type <- 'Same dispersal strategy'
     df <- rbind(df, m)
   }
 }
@@ -30,7 +16,7 @@ df$METE_fit[df$METE_fit < 0] <- 0
 #df$Shannon <- df$Shannon / log(df$n_species)
 
 # with geom_raster:
-group <- paste(df$f_loss, df$mu, df$dispersal_type, sep='-')
+group <- paste(df$f_loss, df$mu, df$dispersal, sep='-')
 df3   <- data.frame(frag     = vector(length = 0),
                     mu       = vector(length = 0),
                     disp     = vector(length = 0),
@@ -46,17 +32,12 @@ brks <- (0:22)/20 - 0.05
 for (i in unique(group)){
   
   fit_hist      <- hist(df$METE_fit[(group == i)], breaks = (brks * 1))
-  
-  if (df$dispersal_type[(group == i)][1] == 'Same dispersal strategy'){
-    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 500)
-  } else {
-    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
-  }
+  nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
   Pm_hist       <- hist(df$Pm[(group == i)], breaks = brks * 1)
  
   df3b   <- data.frame(frag    = df$f_loss[(group == i)][1],
                       mu       = df$mu[(group == i)][1],
-                      disp     = df$dispersal_type[(group == i)][1],
+                      disp     = df$dispersal[(group == i)][1],
                       fit      = fit_hist$mids,
                       fit_dens = fit_hist$counts / 
                         sum(fit_hist$counts) * 100,
@@ -88,7 +69,7 @@ df5$clustering <- 'Random'
 df5$clustering[df5$mu == 3] <- 'Fractal'
 df5$clustering[df5$mu == 5] <- 'Clustered'
 
-sel <- df5$disp == 'Same dispersal strategy'
+sel <- df5$disp == 'similar'
 p1 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering), 
@@ -113,7 +94,7 @@ p1 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) +
         strip.background = element_blank())
 p1
 
-sel <- (df5$disp == 'Different dispersal strategies')
+sel <- (df5$disp == 'different')
 p2 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering), 

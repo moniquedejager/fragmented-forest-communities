@@ -1,7 +1,7 @@
 sim_nr <- 1
 mutation_rate <- 0.0003
 filename <- paste('results/data per iteration/sim_nr=', sim_nr, 
-                  'clustering=1f_loss=0mutation_rate=', mutation_rate,'.txt', sep='')
+                  'clustering=1f_loss=0.1mutation_rate=', mutation_rate,'.txt', sep='')
 df <- read.table(filename, header=TRUE)   
 df <- df[df$sim_nr == 2,]
 
@@ -33,10 +33,12 @@ new_df <- data.frame(iteration_nr = rep(df$iteration_nr, 4),
                            rep('Total # species', length(df$sim_nr)),
                            rep('Mean dispersal strategy', length(df$sim_nr)),
                            rep('% Ancestors from same subcommunity', length(df$sim_nr))),
-                     z = c(df$m_species, df$total_species, df$m_Pm,df$f_t50_same_subcom*100))
+                     z = c(df$m_species, df$total_species, df$m_Pm,df$f_t50_same_subcom*100),
+                     disp = rep(df$dispersal, 4))
 new_df$y <- factor(new_df$y, levels=unique(new_df$y))
 
-ggplot(new_df, aes(x=iteration_nr, y=z, color=f_loss)) + 
+sel = new_df$disp == 'similar'
+ggplot(new_df[sel,], aes(x=iteration_nr, y=z, color=f_loss)) + 
   geom_point(alpha = 0.3)  +
   scale_color_viridis_c(name='% Habitat loss') + 
   facet_grid(cols=vars(clustering), 
