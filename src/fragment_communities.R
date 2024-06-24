@@ -87,7 +87,9 @@ fragment_community <- function(n_ind,
   rv$tot2     <- length(rv$x2)
   
   # now that we have a starting community, we can fragment the environment:
-  rv  <- fragment(rv)
+  if (rv$f_loss > 0){
+    rv  <- fragment(rv)
+  }
   rv$simulation_type <- 'Fragmentation'
   #rv$simulation_type <- 'Initialization'
   rv  <- simulate_community_dynamics(rv)
@@ -108,7 +110,7 @@ dat <- expand.grid(n_ind = 1000,
                    max_mutation = 0,  
                    sim_nr = 1:10,
                    f_loss = round(seq(0.05, 0.95, 0.05), 2),
-                   dispersal = c('similar', 'different'))
+                   dispersal = c('similar'))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system

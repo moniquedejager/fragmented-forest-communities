@@ -7,16 +7,29 @@ df <- df[df$sim_nr == 2,]
 
 f_loss <- seq(0.05, 0.95, 0.05)
 clustering <- c(1, 3, 5)
+sim_nr <- 1:10
+
 for (i in f_loss){
   for (j in clustering){
-    filename <- paste('results/data per iteration/sim_nr=', sim_nr, 
-                      'clustering=',j,
-                      'f_loss=', i,
-                      'mutation_rate=', mutation_rate,'.txt', sep='')
-    df2 <- read.table(filename, header=TRUE)  
-    df <- rbind(df, df2)
+    for (k in sim_nr){
+      filename <- paste('results/data per iteration/sim_nr=', k, 
+                        'clustering=',j,
+                        'f_loss=', i,
+                        'mutation_rate=', mutation_rate,'.txt', sep='')
+      df2 <- read.table(filename, header=TRUE)  
+      df2$dispersal <- 'different'
+      filename2 <- paste('results/data per iteration/sim_nr=', k, 
+                        'clustering=',j,
+                        'f_loss=', i,
+                        'mutation_rate=', mutation_rate,'different.txt', sep='')
+      #write.table(df2, filename2, append=FALSE, 
+      #            row.names = FALSE, col.names = TRUE)
+    }
   }
 }
+
+
+
 
 library(ggplot2)
 

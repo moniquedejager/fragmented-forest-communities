@@ -2,26 +2,17 @@
 library(ggplot2)
 source('./src/summarySE.R')
 
-filename <- './results/simulation results different dispersal 20240611/dispersal_capacity/fragmented_dispersal capacity_data_0.txt'
+filename <- './results/dispersal_capacity/fragmented_dispersal capacity_data_0.05.txt'
 df       <- read.table(filename, header = TRUE)
-df       <- df[df$mutation_rate == 0.0003,]
-df       <- df[df$n_iterations == 10050,]
-df       <- df[40:49,]
-df2      <- df
-df2$mu   <- 3
-df3      <- df
-df3$mu   <- 5
-df       <- rbind(df, df2, df3)
 
-for (i in seq(0.05, 0.95, 0.05)){
-  filename <- paste('./results/simulation results different dispersal 20240611/dispersal_capacity/fragmented_dispersal capacity_data_', i, '.txt', sep='')
+for (i in seq(0.1, 0.95, 0.05)){
+  filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_', i, '.txt', sep='')
   m        <- read.table(filename, header = TRUE)
   m        <- m[m$mutation_rate == 0.0003,]
   
   df    <- rbind(df, m)
 }
-
-df <- df[df$disp_cap > 0,]
+df <- df[df$dispersal == 'different',]
 
 sdf <- summarySE(df, measurevar="perc_indiv", 
                  groupvars=c("mu","f_loss", "disp_cap"))
@@ -33,7 +24,7 @@ sdf$clustering[sdf$mu == 3] <- 'Fractal'
 sdf$clustering[sdf$mu == 5] <- 'Clustered'
 
 sdf$perc_indiv[sdf$perc_indiv == 0] <- NA
-ggplot(sdf, aes(x=f_loss, y=disp_cap, fill=perc_indiv/100)) + 
+ggplot(sdf, aes(x=f_loss*100, y=disp_cap, fill=perc_indiv/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering)) + 
   xlab('% Habitat loss') + 

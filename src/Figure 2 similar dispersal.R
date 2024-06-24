@@ -32,7 +32,12 @@ brks <- (0:22)/20 - 0.05
 for (i in unique(group)){
   
   fit_hist      <- hist(df$METE_fit[(group == i)], breaks = (brks * 1))
-  nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
+  if (df$dispersal[(group == i)][1] == 'similar'){
+    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 450)
+  } else {
+    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
+  }
+  
   Pm_hist       <- hist(df$Pm[(group == i)], breaks = brks * 1)
  
   df3b   <- data.frame(frag    = df$f_loss[(group == i)][1],
@@ -70,13 +75,13 @@ df5$clustering[df5$mu == 3] <- 'Fractal'
 df5$clustering[df5$mu == 5] <- 'Clustered'
 
 sel <- df5$disp == 'similar'
-p1 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) + 
+p1 <- ggplot(df5[sel,], aes(x=frag*100, y=y, fill=z2/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering), 
              rows = vars(type), 
              scales = 'free', 
              switch = 'y') + 
-  scale_fill_gradientn(colors = c('lightyellow','yellow','seagreen', 
+  scale_fill_gradientn(colors = c('yellow','seagreen', 
                                   'darkcyan', 'midnightblue', 'black', 'black'),
                        labels = scales::percent_format(),
                        na.value = 'transparent',
@@ -95,13 +100,13 @@ p1 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) +
 p1
 
 sel <- (df5$disp == 'different')
-p2 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) + 
+p2 <- ggplot(df5[sel,], aes(x=frag*100, y=y, fill=z2/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering), 
              rows = vars(type), 
              scales = 'free', 
              switch = 'y') + 
-  scale_fill_gradientn(colors = c('lightyellow','yellow','seagreen', 
+  scale_fill_gradientn(colors = c('yellow','seagreen', 
                                   'darkcyan', 'midnightblue', 'black', 'black'),
                        labels = scales::percent_format(),
                        na.value = 'transparent',
@@ -120,6 +125,35 @@ p2 <- ggplot(df5[sel,], aes(x=frag, y=y, fill=z2/100)) +
 p2
 
 ggarrange(p1, p2, align='hv', common.legend = TRUE)
+
+df5$disp2 <- 'Different dispersal'
+df5$disp2[df5$disp == 'similar'] <- 'Same dispersal'
+df5$disp2 <- factor(df5$disp2, levels=unique(df5$disp2)[2:1])
+sel <- df5$type == '# Species per subcommunity'
+sel <- df5$type == '% Ancestors from elsewhere'
+sel <- df5$type == "METE's fit to SAD"
+ggplot(df5[sel,], aes(x=frag*100, y=y, fill=z2/100)) + 
+  geom_raster() + 
+  facet_grid(cols = vars(clustering), 
+             rows = vars(disp2), 
+             scales = 'free') + 
+  scale_fill_gradientn(colors = c('yellow','seagreen', 
+                                  'darkcyan', 'midnightblue', 'black', 'black'),
+                       labels = scales::percent_format(),
+                       na.value = 'transparent',
+                       #trans = 'log10',
+                       name="% subcommunities",
+                       limits = c(0, 1),
+                       breaks = c(0, 0.25, 0.5, 0.75, 1)) +
+  xlab('% Habitat loss') + 
+  ylab(df5$type[sel][1]) + 
+  theme_bw() + 
+  guides(fill = guide_colorbar(barwidth = 15)) + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank())
+
+
 
 
 # To calculate differences between clustering levels:
