@@ -10,6 +10,8 @@ df <- read.table(filename, header = TRUE)
 for (i in 2:10){
   filename <- paste('results/dissimilarity/dissimilarity_data_', i, '.txt', sep='')
   df2 <- read.table(filename, header = TRUE)
+  #df <- df2[df2$dispersal == 'similar',]
+  #write.table(df, filename, append = FALSE, row.names = FALSE, col.names = TRUE)
   df <- rbind(df, df2)
 }
 

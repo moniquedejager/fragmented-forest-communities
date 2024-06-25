@@ -3,14 +3,17 @@ library(ggplot2)
 library(ggpubr)
 source('./src/summarySE.R')
 
-filename <- 'results/simulation_data/fragmented_simulation_data_0.05.txt'
+filename <- 'results/simulation_data/fragmented_simulation_data_0.txt'
 df <- read.table(filename, header=T)
 
-for (i in seq(0.1, 0.95, 0.05)){
+for (i in seq(0.05, 0.95, 0.05)){
   filename <- paste('results/simulation_data/fragmented_simulation_data_',
                     i,'.txt', sep='')
   df2 <- read.table(filename, header=T)
   df  <- rbind(df, df2)
+  
+  #df <- df2[df2$dispersal == 'similar',]
+  #write.table(df, filename, append = FALSE, row.names = FALSE, col.names = TRUE)
 }
 
 
@@ -21,34 +24,47 @@ df <- data.frame(clustering = rep(df$mu, 2),
                  static_dynamic = c(rep('Dynamic', length(df$mu)), 
                                     rep('Static', length(df$mu))))
 
-m         <- read.table('results/community_composition/initial_community_dif.txt')
-landscape <- as.matrix(m)
-for (i in 1:20){
-  # backwards SAR:
-  area_size <- i * 20
-  n_species <- length(unique(as.vector(landscape[,1:area_size])))
-  
-  df2 <- data.frame(clustering = 0,
-                    area_size = area_size,
-                    n_species = n_species,
-                    dispersal_type = 'different',
-                    static_dynamic = c('Static', 'Dynamic'))
-  df <- rbind(df, df2)
+for (sim_nr in 1:10){
+  for (mu in c(1, 3, 5)){
+    for (disp in c('different', 'similar')){
+      filename <- paste('results/community_composition/', 
+                        disp, mu, '_', sim_nr, '_0_3e-04_0.txt', sep='')
+      m <- read.table(filename)
+      landscape <- as.matrix(m)
+      for (i in 1:20){
+        # backwards SAR:
+        area_size <- i * 20
+        n_species <- length(unique(as.vector(landscape[,1:area_size])))
+        
+        df2 <- data.frame(clustering = 0,
+                          area_size = area_size,
+                          n_species = n_species,
+                          dispersal_type = disp,
+                          static_dynamic = c('Dynamic'))
+        df <- rbind(df, df2)
+      }
+    }
+  }
 }
 
-m         <- read.table('results/community_composition/initial_community_sim.txt')
-landscape <- as.matrix(m)
-for (i in 1:20){
-  # backwards SAR:
-  area_size <- i * 20
-  n_species <- length(unique(as.vector(landscape[,1:area_size])))
-  
-  df2 <- data.frame(clustering = 0,
-                    area_size = area_size,
-                    n_species = n_species,
-                    dispersal_type = 'similar',
-                    static_dynamic = c('Static', 'Dynamic'))
-  df <- rbind(df, df2)
+filenames <- c('results/community_composition/initial_community_sim.txt',
+               'results/community_composition/initial_community_dif.txt')
+disp <- c('similar', 'different')
+for (j in 1:2){
+  m <- read.table(filenames[j])
+  landscape <- as.matrix(m)
+  for (i in 1:20){
+    # backwards SAR:
+    area_size <- i * 20
+    n_species <- length(unique(as.vector(landscape[,1:area_size])))
+    
+    df2 <- data.frame(clustering = 0,
+                      area_size = area_size,
+                      n_species = n_species,
+                      dispersal_type = disp[j],
+                      static_dynamic = c('Static'))
+    df <- rbind(df, df2)
+  }
 }
 
 sdf <- summarySE(df, measurevar="n_species", 
