@@ -16,7 +16,6 @@ for (i in seq(0.05, 0.95, 0.05)){
   #write.table(df, filename, append = FALSE, row.names = FALSE, col.names = TRUE)
 }
 
-
 df <- data.frame(clustering = rep(df$mu, 2),
                  area_size = rep(400*(1-df$f_loss), 2),
                  n_species = c(df$n_species, df$static_n_species),
@@ -29,19 +28,21 @@ for (sim_nr in 1:10){
     for (disp in c('different', 'similar')){
       filename <- paste('results/community_composition/', 
                         disp, mu, '_', sim_nr, '_0_3e-04_0.txt', sep='')
-      m <- read.table(filename)
-      landscape <- as.matrix(m)
-      for (i in 1:20){
-        # backwards SAR:
-        area_size <- i * 20
-        n_species <- length(unique(as.vector(landscape[,1:area_size])))
-        
-        df2 <- data.frame(clustering = 0,
-                          area_size = area_size,
-                          n_species = n_species,
-                          dispersal_type = disp,
-                          static_dynamic = c('Dynamic'))
-        df <- rbind(df, df2)
+      if (file.exists(filename)){
+        m <- read.table(filename)
+        landscape <- as.matrix(m)
+        for (i in 1:20){
+          # backwards SAR:
+          area_size <- i * 20
+          n_species <- length(unique(as.vector(landscape[1:area_size,])))
+          
+          df2 <- data.frame(clustering = 0,
+                            area_size = area_size,
+                            n_species = n_species,
+                            dispersal_type = disp,
+                            static_dynamic = c('Dynamic'))
+          df <- rbind(df, df2)
+        }
       }
     }
   }
@@ -56,7 +57,7 @@ for (j in 1:2){
   for (i in 1:20){
     # backwards SAR:
     area_size <- i * 20
-    n_species <- length(unique(as.vector(landscape[,1:area_size])))
+    n_species <- length(unique(as.vector(landscape[1:area_size,])))
     
     df2 <- data.frame(clustering = 0,
                       area_size = area_size,
@@ -85,7 +86,7 @@ sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different d
 
 pd <- position_dodge(0.01) 
 ggplot(sdf, aes(x=area_size, y=n_species, color=mu2)) + 
-  geom_errorbar(aes(ymin=n_species-ci, ymax=n_species+ci), width=0, position=pd) + 
+  geom_errorbar(aes(ymin=n_species-sd, ymax=n_species+sd), width=0, position=pd) + 
   geom_line(position=pd) +
   geom_point(position=pd) + 
   scale_x_continuous(trans='log10') + 
@@ -100,6 +101,7 @@ ggplot(sdf, aes(x=area_size, y=n_species, color=mu2)) +
       strip.background = element_blank(),
       legend.title=element_blank())
 
+range(sdf$area_size)
 
 ggplot(sdf, aes(x=area_size, y=n_species, color=dispersal_type)) + 
   geom_errorbar(aes(ymin=n_species-ci, ymax=n_species+ci), width=0, position=pd) + 
@@ -115,3 +117,24 @@ ggplot(sdf, aes(x=area_size, y=n_species, color=dispersal_type)) +
         strip.placement = "outside", 
         strip.background = element_blank(),
         legend.title=element_blank())
+
+
+m <- read.table('results/community_composition/initial_community_dif.txt')
+m <- as.vector(t(as.matrix(m)))
+m2<- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
+Pm <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+
+hist(Pm)
+mean(Pm)
+
+
+m <- read.table('results/community_composition/different1_1_0_3e-04_0.txt')
+m <- t(as.matrix(m))
+m2 <- m[7:1006,]
+m <- as.vector(m2)
+
+m2<- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
+Pm <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+
+hist(Pm)
+mean(Pm)

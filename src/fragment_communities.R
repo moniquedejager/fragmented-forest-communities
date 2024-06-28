@@ -109,8 +109,8 @@ dat <- expand.grid(n_ind = 1000,
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
                    sim_nr = 1:10,
-                   f_loss = 0, #round(seq(0.05, 0.95, 0.05), 2),
-                   dispersal = c('similar', 'different'))
+                   f_loss = round(seq(0, 0.95, 0.05), 2),
+                   dispersal = 'different') #c('similar', 'different'))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system

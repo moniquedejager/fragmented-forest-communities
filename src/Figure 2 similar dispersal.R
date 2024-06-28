@@ -1,10 +1,10 @@
 library(ggplot2)
 library(ggpubr)
 
-filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.txt'
+filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.05.txt'
 df <- read.table(filename, header = TRUE)
 
-for (i in seq(0.05, 0.95, 0.05)){
+for (i in seq(0.1, 0.95, 0.05)){
   filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
@@ -38,7 +38,7 @@ for (i in unique(group)){
   if (df$dispersal[(group == i)][1] == 'similar'){
     nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 450)
   } else {
-    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
+    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 100)
   }
   
   Pm_hist       <- hist(df$Pm[(group == i)], breaks = brks * 1)
@@ -155,6 +155,82 @@ ggplot(df5[sel,], aes(x=frag*100, y=y, fill=z2/100)) +
   theme(legend.position = 'top',
         strip.placement = "outside", 
         strip.background = element_blank())
+
+##### use averages instead:
+source('./src/summarySE.R')
+
+# average number of species per subcommunity:
+sdf <- summarySE(df, measurevar='n_species',
+                 groupvars=c('mu', 'f_loss', 'dispersal'))
+sdf$mu2 <- 'Random'
+sdf$mu2[sdf$mu == 3] <- 'Fractal'
+sdf$mu2[sdf$mu == 5] <- 'Clustered'
+sdf$disp_type <- 'Same dispersal'
+sdf$disp_type[sdf$dispersal == 'different'] <- 'Different dispersal'
+sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different dispersal'))
+
+pd <- position_dodge(1) 
+ggplot(sdf, aes(x=f_loss*100, y=n_species, color=mu2))+
+  geom_errorbar(aes(ymin=n_species-ci, ymax=n_species+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(rows=vars(disp_type), scales='free_y') + 
+  xlab('% Habitat loss') + 
+  ylab('Average no. species per subcommunity') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank())
+
+# average % ancestors from elsewhere:
+sdf <- summarySE(df, measurevar='Pm',
+                 groupvars=c('mu', 'f_loss', 'dispersal'))
+sdf$mu2 <- 'Random'
+sdf$mu2[sdf$mu == 3] <- 'Fractal'
+sdf$mu2[sdf$mu == 5] <- 'Clustered'
+sdf$disp_type <- 'Same dispersal'
+sdf$disp_type[sdf$dispersal == 'different'] <- 'Different dispersal'
+sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different dispersal'))
+
+pd <- position_dodge(1) 
+ggplot(sdf, aes(x=f_loss*100, y=1 - Pm, color=mu2))+
+  geom_errorbar(aes(ymin=(1 - Pm)-ci, ymax=(1 - Pm)+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(rows=vars(disp_type), scales='free_y') + 
+  xlab('% Habitat loss') + 
+  ylab('Average % ancestors from elsewhere') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank())
+
+# average METE fit to SAD per subcommunity:
+sdf <- summarySE(df, measurevar='METE_fit',
+                 groupvars=c('mu', 'f_loss', 'dispersal'))
+sdf$mu2 <- 'Random'
+sdf$mu2[sdf$mu == 3] <- 'Fractal'
+sdf$mu2[sdf$mu == 5] <- 'Clustered'
+sdf$disp_type <- 'Same dispersal'
+sdf$disp_type[sdf$dispersal == 'different'] <- 'Different dispersal'
+sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different dispersal'))
+
+pd <- position_dodge(1) 
+ggplot(sdf, aes(x=f_loss*100, y=METE_fit, color=mu2))+
+  geom_errorbar(aes(ymin=METE_fit-ci, ymax=METE_fit+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(rows=vars(disp_type)) + 
+  xlab('% Habitat loss') + 
+  ylab('METE fit to SAD') +
+  ylim(c(0, 1)) + 
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank())
 
 
 
