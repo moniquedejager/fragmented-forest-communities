@@ -3,7 +3,7 @@ library(ggplot2)
 source('./src/summarySE.R')
 
 start <- TRUE
-for (i in seq(0.05, 0.95, 0.05)){
+for (i in seq(0, 0.95, 0.05)){
   filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m        <- read.table(filename, header = TRUE)

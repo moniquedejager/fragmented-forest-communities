@@ -6,13 +6,13 @@ source('./src/summarySE.R')
 filename <- 'results/simulation_data/fragmented_simulation_data_0.txt'
 df <- read.table(filename, header=T)
 
-for (i in seq(0.05, 0.95, 0.05)){
+for (i in seq(0, 0.95, 0.05)){
   filename <- paste('results/simulation_data/fragmented_simulation_data_',
                     i,'.txt', sep='')
   df2 <- read.table(filename, header=T)
   df  <- rbind(df, df2)
   
-  #df <- df2[df2$dispersal == 'similar',]
+  #df <- df2[df2$dispersal == 'different',]
   #write.table(df, filename, append = FALSE, row.names = FALSE, col.names = TRUE)
 }
 

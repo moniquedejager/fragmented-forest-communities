@@ -64,7 +64,7 @@ fragment_community <- function(n_ind,
     m <- read.table('results/community_composition/initial_community_sim.txt')
     m <- as.vector(t(as.matrix(m)))
     rv$species <- m
-    rv$Pm      <- rep(rv$Pm_range, rv$n*rv$n_ind)
+    rv$Pm      <- rep(0.8, rv$n*rv$n_ind)
   } else {
     m <- read.table('results/community_composition/initial_community_dif.txt')
     m <- as.vector(t(as.matrix(m)))
@@ -110,7 +110,7 @@ dat <- expand.grid(n_ind = 1000,
                    max_mutation = 0,  
                    sim_nr = 1:10,
                    f_loss = round(seq(0, 0.95, 0.05), 2),
-                   dispersal = 'different') #c('similar', 'different'))
+                   dispersal = 'similar') #c('similar', 'different'))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system

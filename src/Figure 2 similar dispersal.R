@@ -4,13 +4,13 @@ library(ggpubr)
 filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.05.txt'
 df <- read.table(filename, header = TRUE)
 
-for (i in seq(0.1, 0.95, 0.05)){
+for (i in seq(0, 0.95, 0.05)){
   filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
     df <- rbind(df, m)
     
-    #df <- m[m$dispersal == 'similar',]
+    #df <- m[m$dispersal == 'different',]
     #write.table(df, filename, append = FALSE, row.names = FALSE, col.names = TRUE)
   }
 }

@@ -1,11 +1,11 @@
 sim_nr <- 1
 mutation_rate <- 0.0003
 filename <- paste('results/data per iteration/sim_nr=', sim_nr, 
-                  'clustering=1f_loss=0.1mutation_rate=', mutation_rate,'.txt', sep='')
+                  'clustering=1f_loss=0mutation_rate=', mutation_rate,'.txt', sep='')
 df <- read.table(filename, header=TRUE)   
 df <- df[df$sim_nr == 2,]
 
-f_loss <- seq(0.05, 0.95, 0.05)
+f_loss <- seq(0, 0.95, 0.05)
 clustering <- c(1, 3, 5)
 sim_nr <- 1:10
 
@@ -17,7 +17,9 @@ for (i in f_loss){
                         'f_loss=', i,
                         'mutation_rate=', mutation_rate,'.txt', sep='')
       df2 <- read.table(filename, header=TRUE)  
-      df2$dispersal <- 'different'
+      df2 <- df2[df2$dispersal == 'different',]
+      
+      #df2$dispersal <- 'different'
       filename2 <- paste('results/data per iteration/sim_nr=', k, 
                         'clustering=',j,
                         'f_loss=', i,
