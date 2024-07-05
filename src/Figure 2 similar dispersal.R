@@ -4,7 +4,7 @@ library(ggpubr)
 filename <- 'results/subcommunity_data/fragmented_subcommunity_data_0.05.txt'
 df <- read.table(filename, header = TRUE)
 
-for (i in seq(0, 0.95, 0.05)){
+for (i in seq(0.1, 0.95, 0.05)){
   filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '.txt', sep='')
   if (file.exists(filename)){
     m  <- read.table(filename, header = TRUE)
@@ -38,7 +38,7 @@ for (i in unique(group)){
   if (df$dispersal[(group == i)][1] == 'similar'){
     nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 450)
   } else {
-    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 100)
+    nspecies_hist <- hist(df$n_species[(group == i)], breaks = brks * 150)
   }
   
   Pm_hist       <- hist(df$Pm[(group == i)], breaks = brks * 1)
@@ -158,6 +158,7 @@ ggplot(df5[sel,], aes(x=frag*100, y=y, fill=z2/100)) +
 
 ##### use averages instead:
 source('./src/summarySE.R')
+#df$METE_fit[df$METE_fit < 0] <- 0
 
 # average number of species per subcommunity:
 sdf <- summarySE(df, measurevar='n_species',
@@ -182,6 +183,7 @@ ggplot(sdf, aes(x=f_loss*100, y=n_species, color=mu2))+
         strip.placement = "outside", 
         strip.background = element_blank(),
         legend.title=element_blank())
+m1 <- sdf
 
 # average % ancestors from elsewhere:
 sdf <- summarySE(df, measurevar='Pm',
@@ -206,6 +208,7 @@ ggplot(sdf, aes(x=f_loss*100, y=1 - Pm, color=mu2))+
         strip.placement = "outside", 
         strip.background = element_blank(),
         legend.title=element_blank())
+m2 <- sdf
 
 # average METE fit to SAD per subcommunity:
 sdf <- summarySE(df, measurevar='METE_fit',
@@ -232,7 +235,33 @@ ggplot(sdf, aes(x=f_loss*100, y=METE_fit, color=mu2))+
         strip.background = element_blank(),
         legend.title=element_blank())
 
+m3 <- sdf
 
+# plot them together
+names(m1)[names(m1) == 'n_species'] <- 'y'
+names(m2)[names(m2) == 'Pm'] <- 'y'
+m2$y <- 1 - m2$y
+names(m3)[names(m3) == 'METE_fit'] <- 'y'
+
+m1$ylab <- '# Species per subcommunity'
+m2$ylab <- '% ancestors from elsewhere'
+m3$ylab <- 'METE fit to SAD'
+
+sdf <- rbind(m1, m2, m3)
+
+sdf$ylab <- factor(sdf$ylab, levels=unique(sdf$ylab))
+ggplot(sdf, aes(x=f_loss * 100, y=y, color=mu2)) + 
+  geom_errorbar(aes(ymin=y-ci, ymax=y+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(cols=vars(disp_type), rows=vars(ylab), scales='free_y', switch='y') + 
+  xlab('% Habitat loss') + 
+  ylab('') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank())
 
 
 # To calculate differences between clustering levels:

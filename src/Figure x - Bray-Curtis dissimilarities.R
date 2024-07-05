@@ -29,7 +29,7 @@ df2$clustering[df2$mu == 5] <- 'Clustered'
 
 df2$disp2 <- 'Same dispersal'
 df2$disp2[df2$disp == 1] <- 'Different dispersal'
-df2$disp2 <- factor(df2$disp2, levels=unique(df2$disp2))
+df2$disp2 <- factor(df2$disp2, levels=unique(df2$disp2)[2:1])
 ggplot(df2, aes(x=f_hab_loss*100, y=dissimilarity, fill=z/1900)) + 
   geom_raster() + 
   facet_grid(cols=vars(clustering), rows=vars(disp2)) + 
