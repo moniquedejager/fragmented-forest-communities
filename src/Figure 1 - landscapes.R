@@ -11,7 +11,7 @@ x <- rep(1:20, 20)
 y <- sort(x)
 
 for (mu in c(1, 3, 5)){
-  filename <- paste('results/simulation results 03-2024/landscapes/landscapes_4_', mu, '.txt', sep='')
+  filename <- paste('results/simulation results different dispersal 20240611/landscapes/landscapes_4_', mu, '.txt', sep='')
   landscape<- as.matrix(read.table(filename))  
   
   for (i in 1:20){
@@ -23,7 +23,6 @@ for (mu in c(1, 3, 5)){
                        hab  = landscape[,i])
     df   <- rbind(df, df2)
   }
-  
 }
 
 df$loss2 <- paste(df$loss, '% habitat loss', sep='')
@@ -48,7 +47,7 @@ df2$clustering[df2$mu == 3] <- 'Fractal'
 df2$clustering[df2$mu == 5] <- 'Clustered'
 
 sel <- (df2$loss %in% c(10, 30, 50, 70, 90)) & (df2$hab == 1)
-ggplot(df2[sel,], aes(x=x, y=y)) +
+p1 <- ggplot(df2[sel,], aes(x=x, y=y)) +
   geom_raster(fill='green4') +
   facet_grid(rows=vars(loss2), cols=vars(clustering), switch = 'y') + 
   theme_bw() + 
@@ -56,3 +55,10 @@ ggplot(df2[sel,], aes(x=x, y=y)) +
   ylab('') + 
   theme(strip.placement = "outside", 
         strip.background = element_blank())
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 1.tif', 
+     width = 4, height = 6, units = 'in', res = 600)
+p1
+dev.off()
+

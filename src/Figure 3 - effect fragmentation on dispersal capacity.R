@@ -22,8 +22,6 @@ df <- df[df$dispersal == 'different',]
 sdf <- summarySE(df, measurevar="perc_indiv", 
                  groupvars=c("mu","f_loss", "disp_cap"))
 
-windows(height=4, width=7)
-
 sdf$clustering <- 'Random'
 sdf$clustering[sdf$mu == 3] <- 'Fractal'
 sdf$clustering[sdf$mu == 5] <- 'Clustered'
@@ -65,7 +63,7 @@ sdf$clustering[sdf$mu == 3] <- 'Fractal'
 sdf$clustering[sdf$mu == 5] <- 'Clustered'
 
 pd <- position_dodge(0.01) 
-ggplot(sdf, aes(x=f_loss*100, y=y, color=clustering)) + 
+p1 <- ggplot(sdf, aes(x=f_loss*100, y=y, color=clustering)) + 
   geom_errorbar(aes(ymin=y-ci, ymax=y+ci), width=0, position=pd) + 
   geom_line(position=pd) +
   geom_point(position=pd) + 
@@ -76,4 +74,10 @@ ggplot(sdf, aes(x=f_loss*100, y=y, color=clustering)) +
         strip.placement = "outside", 
         strip.background = element_blank(),
         legend.title=element_blank())
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 3.tif', 
+     width = 4, height = 3, units = 'in', res = 600)
+p1
+dev.off()
   
