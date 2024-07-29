@@ -1,7 +1,6 @@
-# Patch destruction using weighted sampling. 
-
 fragment <- function(rv){
-
+  # Patch destruction using weighted sampling. 
+  
   # first destroyed patch:
   destroyed    <- sample(1:rv$n, 1)
   rv$comm_type[destroyed] <- 'fragmented'

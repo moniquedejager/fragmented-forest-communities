@@ -1,11 +1,5 @@
 
 write_data_to_files_fragmentation <- function(rv){
-  #library(ggplot2)
-  library(meteR) # rominger and merow, 2016
-  library(benthos)
-  source('./src/est_RAI.R')
-  source('./src/calculate_dissimilarity.R')
-
   # Per metacommunity, record: 
   # - the total number of species
   # - the frequency distribution of dispersal strategies
@@ -18,6 +12,11 @@ write_data_to_files_fragmentation <- function(rv){
   # For a subset of subcommunities, record: 
   # - the Bray-Curtis dissimilarity. 
 
+  library(meteR) # rominger and merow, 2016
+  library(benthos)
+  source('./src/est_RAI.R')
+  source('./src/calculate_dissimilarity.R')
+  
   # calculate distance from t-50 ancestor:   
   Pm <- tapply(rv$comm_ID2 == rv$origin_ID_t50, rv$comm_ID2, mean)
   Pm <- Pm[rv$comm_type == 'sub']

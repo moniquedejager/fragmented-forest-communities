@@ -6,7 +6,7 @@ simulate_community_dynamics <- function(rv){
   ###################################################################
     
   source('src/record.R')
-  source('src/write_data_to_files_fragmentation.R')
+  #source('src/write_data_to_files_fragmentation.R')
   print(table(rv$Pm))
   
   calc_n_spec <- function(x) {
@@ -18,8 +18,7 @@ simulate_community_dynamics <- function(rv){
   mean_nspecies   <- vector(length=0)
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
-  p               <- 0
-  #while (p < 5){
+
   while (rv$iteration_nr < 10001){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
@@ -99,23 +98,6 @@ simulate_community_dynamics <- function(rv){
     mn            <- mean(rv$nspecies[rv$comm_type =='sub'])
     mean_nspecies <- c(mean_nspecies, mn)
     total_species <- c(total_species, length(unique(rv$species)))
-    
-    #h <- hist(rv$Pm[rv$comm_type2 == 'sub'], breaks = seq(-0.025, 1.025, 0.05))
-    #print(round(h$counts / sum(h$counts), 3))
-    plot(total_species)
-    
-    if (length(mean_nspecies) > 4){
-      x <- 1:5
-      s <- summary(lm(mean_nspecies[length(mean_nspecies) - 4:0]~x))
-      s2 <- summary(lm(total_species[length(total_species) - 4:0]~x))
-      Pr <- c(s$coefficients[2,4], s2$coefficients[2,4])
-      Pr[is.na(Pr)] <- 1
-      
-      if ((Pr[1] > 0.05) & 
-          (Pr[2] > 0.05)) { 
-        p <- p + 1 
-      }
-    }
     
     if (length(mean_nspecies) %in% ((1:10)*5)){
       #write_data_to_files_fragmentation(rv)

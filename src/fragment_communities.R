@@ -1,20 +1,3 @@
-# Restore communities.R
-# this script is not finished! It is a copy of fragment communities.R
-
-# nog in te verwerken: tijd tussen fragmentatie en restoratie
-# wegschrijven data per 50 iteraties
-
-n_ind = 1000
-Pm_range = 1
-clustering = 1
-sim_nr = 4
-mutation_rate = 0 #0.0001
-max_mutation = 0.05
-f_loss = 0.5
-dispersal = 'similar' # similar or different dispersal strategies
-#hab_cover = 0.95
-#clustering_restored = 1
-
 fragment_community <- function(n_ind, 
                               Pm_range,
                               clustering, 
@@ -23,10 +6,23 @@ fragment_community <- function(n_ind,
                               max_mutation,
                               f_loss,
                               dispersal){
+  # We simulated subcommunity dynamics in a 2-dimensional, semi-spatial, 
+  # near-neutral, individual-based model. The environment consists of 20 x 20 
+  # cells, each cell having a subcommunity of 1,000 individuals. Initially, 
+  # all cells are habitable (i.e. there is no fragmentation) and, contain a 
+  # subcommunity. Each subcommunity that during an initialization phase is 
+  # populated with the highest diversity theoretically possible during an 
+  # initialization phase and is subsequently allowed to stabilize, after which 
+  # we run the simulations with fragmentationhabitat loss. We simulated 20 
+  # different levels of habitat loss, from 0 to 95% habitat destruction, at 
+  # three fragmentation configurations: (i) clustered, (ii) fractal, and (iii) 
+  # random habitat destruction. For full details on the model, see De Jager et
+  # al. (in prep.). 
+  
+  # Libraries and custom functions:
   library(ggplot2)
   source('src/simulate_community_dynamics.R')
   source('src/fragment.R')
-  #source('src/restore.R')
   source('./src/write_data_to_files_fragmentation.R')
   
   rv <- list(n          = 400,
@@ -40,9 +36,7 @@ fragment_community <- function(n_ind,
              max_mutation  = max_mutation,
              f_loss        = f_loss,
              dispersal     = dispersal)
-             #hab_cover     = hab_cover,
-             #clustering_restored = clustering_restored,
- 
+             
   # position the cells in the lattice:
   rv$x <- rep(1:rv$nx, rv$ny)
   rv$y <- sort(rep(1:rv$ny, rv$nx))
@@ -110,7 +104,7 @@ dat <- expand.grid(n_ind = 1000,
                    max_mutation = 0,  
                    sim_nr = 1:10,
                    f_loss = round(seq(0, 0.95, 0.05), 2),
-                   dispersal = 'similar') #c('similar', 'different'))
+                   dispersal = c('similar', 'different'))
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system
