@@ -70,6 +70,7 @@ m3$ylab <- 'METE fit to SAD'
 
 sdf <- rbind(m1, m2, m3)
 
+pd <- position_dodge(1) 
 sdf$ylab <- factor(sdf$ylab, levels=unique(sdf$ylab))
 p1 <- ggplot(sdf, aes(x=f_loss * 100, y=y, color=mu2)) + 
   geom_errorbar(aes(ymin=y-ci, ymax=y+ci), width=0, position=pd) + 

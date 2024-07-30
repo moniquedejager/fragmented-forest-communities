@@ -3,6 +3,7 @@
 
 # hypothesis: Euclidian distance between subpopulations is negatively related 
 # to similarity in community composition
+library(ggplot2)
 
 filename <- 'results/dissimilarity/dissimilarity_data_1.txt'
 df <- read.table(filename, header = TRUE)
@@ -47,10 +48,51 @@ p1 <- ggplot(df2, aes(x=f_hab_loss*100, y=dissimilarity, fill=z/1900)) +
   theme(legend.position = 'top',
         strip.placement = "outside", 
         strip.background = element_blank())
+p1
 
 # tiff file 600 dpi:
 tiff(filename = 'figures/Figure 5.tif', 
      width = 5, height = 4, units = 'in', res = 600)
 p1
 dev.off()
+
+##### use averages instead:
+source('./src/summarySE.R')
+#df$METE_fit[df$METE_fit < 0] <- 0
+
+# average number of species per subcommunity:
+sdf <- summarySE(df, measurevar='dissimilarity',
+                 groupvars=c('mu', 'f_hab_loss', 'dispersal'))
+sdf$mu2 <- 'Random'
+sdf$mu2[sdf$mu == 3] <- 'Fractal'
+sdf$mu2[sdf$mu == 5] <- 'Clustered'
+sdf$disp_type <- 'Same dispersal'
+sdf$disp_type[sdf$dispersal == 'different'] <- 'Different dispersal'
+sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different dispersal'))
+
+pd <- position_dodge(1) 
+p2 <- ggplot(sdf, aes(x=f_hab_loss * 100, y=dissimilarity, color=mu2)) + 
+  geom_errorbar(aes(ymin=dissimilarity-ci, ymax=dissimilarity+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(cols=vars(disp_type)) + 
+  xlab('% Habitat loss') + 
+  ylab('Bray-Curtis dissimilarity') +
+  ylim(c(0, 1)) + 
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank(), 
+        plot.margin = unit(c(0.1, 0.2, 0.1, 0.1), "inches"),
+        panel.spacing.x = unit(1, "lines"))
+
+p2
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 5.tif', 
+     width = 4, height = 3, units = 'in', res = 600)
+p2
+dev.off()
+
 
