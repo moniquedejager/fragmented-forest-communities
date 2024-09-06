@@ -5,14 +5,14 @@
 # wegschrijven data per 50 iteraties
 
 n_ind = 1000
-Pm_range = 0.5
+Pm_range = 1
 clustering = 1
 sim_nr = 4
 mutation_rate = 0.0003 #0.0001
 max_mutation = 0
 f_loss = 0.95
 dispersal = 'different'
-hab_cover = 0.95
+hab_cover = 0.05
 clustering_restored = 1
 n_iterations = 50
 
@@ -29,7 +29,6 @@ restore_community <- function(n_ind,
                               n_iterations){
   library(ggplot2)
   source('src/simulate_community_dynamics.R')
-  source('src/fragment.R')
   source('src/restore.R')
   source('./src/write_data_to_files_restoration.R')
   

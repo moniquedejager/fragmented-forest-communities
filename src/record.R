@@ -14,6 +14,8 @@ record <- function(rv){
                      simulation_type     = rv$simulation_type,
                      iteration_nr        = rv$iteration_nr,
                      dispersal           = rv$dispersal,
+                     hab_cover           = rv$hab_cover,
+                     clustering_restored = rv$clustering_restored,
                      m_species           = mean(rv$nspecies[rv$comm_type == 'sub']),
                      total_species       = length(unique(rv$species[rv$species > 0])),
                      f_t50_same_subcom   = mean(rv$comm_ID2[rv$comm_type2 == 'sub'] 
@@ -23,7 +25,9 @@ record <- function(rv){
   filename <- paste('results/data per iteration/sim_nr=', rv$sim_nr, 
                     'clustering=', rv$clustering,
                     'f_loss=', rv$f_loss, 
-                    'mutation_rate=',rv$mutation_rate,'.txt', sep='')
+                    'mutation_rate=',rv$mutation_rate,
+                    'restoration', rv$hab_cover,
+                    '.txt', sep='')
   if (file.exists(filename)){
     write.table(data, filename, append = TRUE, col.names = FALSE, row.names = FALSE)
   } else {

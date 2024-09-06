@@ -6,7 +6,6 @@ simulate_community_dynamics <- function(rv){
   ###################################################################
     
   source('src/record.R')
-  #source('src/write_data_to_files_fragmentation.R')
   print(table(rv$Pm))
   
   calc_n_spec <- function(x) {
@@ -19,10 +18,12 @@ simulate_community_dynamics <- function(rv){
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
 
-  while (rv$iteration_nr < 10001){
+  while (rv$iteration_nr < 601){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
+      # print(table(rv$Pm))
+      
       # we let each individual reproduce and disperse to a subcommunity:
       # dispersal depends on the dispersal parameter, which corresponds to 
       # the species number. To be able to code this efficiently, we make 
@@ -100,7 +101,7 @@ simulate_community_dynamics <- function(rv){
     total_species <- c(total_species, length(unique(rv$species)))
     
     if (length(mean_nspecies) %in% ((1:10)*5)){
-      #write_data_to_files_fragmentation(rv)
+      record(rv)
     }
   }
   return(rv)
