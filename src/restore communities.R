@@ -8,9 +8,10 @@ n_ind = 1000
 Pm_range = 0.5
 clustering = 1
 sim_nr = 4
-mutation_rate = 0 #0.0001
-max_mutation = 0.05
+mutation_rate = 0.0003 #0.0001
+max_mutation = 0
 f_loss = 0.95
+dispersal = 'different'
 hab_cover = 0.95
 clustering_restored = 1
 n_iterations = 50
@@ -22,6 +23,7 @@ restore_community <- function(n_ind,
                               mutation_rate, 
                               max_mutation,
                               f_loss,
+                              dispersal,
                               hab_cover,
                               clustering_restored,
                               n_iterations){
@@ -41,6 +43,7 @@ restore_community <- function(n_ind,
              mutation_rate = mutation_rate,
              max_mutation  = max_mutation,
              f_loss        = f_loss,
+             dispersal     = dispersal,
              hab_cover     = hab_cover,
              clustering_restored = clustering_restored,
              n_iterations  = n_iterations) 
@@ -48,7 +51,7 @@ restore_community <- function(n_ind,
   # position the cells in the lattice:
   rv$x <- rep(1:rv$nx, rv$ny)
   rv$y <- sort(rep(1:rv$ny, rv$nx))
-  rv$comm_type <- rep('sub', length(rv$x))
+  rv$comm_type <- rep('fragmented', length(rv$x))
     
   rv$x2 <- unlist(lapply(rv$x, function(x) 
     rep(x, rv$n_ind)))
@@ -61,10 +64,27 @@ restore_community <- function(n_ind,
   rv$comm_ID2   <- unlist(lapply(rv$comm_ID, function(x) 
     rep(x, rv$n_ind)))
   
-  # start with the pristine, unfragmented landscape, with 1 individual of 
-  # species 1 to 1000 per subcommunity:
-  rv$species <- rep(1:rv$n_ind, rv$n)
-  rv$Pm      <- ceiling(rv$species/100)/10 * rv$Pm_range
+  # start with the fragmented environment: 
+  filename <- paste('./results/community_composition/', rv$dispersal,
+                    rv$clustering,'_',rv$sim_nr, '_',rv$f_loss, 
+                    '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
+  m  <- read.table(filename)
+  x2 <- m$V3
+  y2 <- m$V4
+  
+  rv$species <- rep(0, rv$n*rv$n_ind)
+  rv$Pm      <- rv$species
+
+  for (i in 1:length(x2)){
+    m2   <- t(m[i, 7:1006])
+    spec <- as.numeric(unlist(strsplit(m2, '-'))[(1:(length(m2)))*2 - 1])
+    Pm   <- as.numeric(unlist(strsplit(m2, '-'))[(1:(length(m2)))*2])
+    
+    rv$species[(rv$x2 == x2[i])&(rv$y2 == y2[i])] <- spec
+    rv$Pm[(rv$x2 == x2[i])&(rv$y2 == y2[i])] <- Pm
+    rv$comm_type2[(rv$x2 == x2[i])&(rv$y2 == y2[i])] <- 'sub'
+    rv$comm_type[(rv$x == x2[i])&(rv$y == y2[i])] <- 'sub'
+  }
   
   # we furthermore need to define the local neighborhood per cell
   rv$dx   <- rep(-5:5, 11)
@@ -79,24 +99,13 @@ restore_community <- function(n_ind,
   rv$tot      <- rv$n_ind * rv$n
   rv$tot2     <- length(rv$x2)
   
-  rv$simulation_type <- 'Initializing'
-  rv  <- simulate_community_dynamics(rv)
-
-  # now that we have a starting community, we can fragment the environment:
-  rv  <- fragment(rv)
-  rv$simulation_type <- 'Fragmentation'
-  rv  <- simulate_community_dynamics(rv)
-  
-  # restore some of the communities:
+  # now that we have a starting community, we can restore the environment:
   rv <- restore(rv)
   rv$simulation_type <- 'Restoration'
   rv  <- simulate_community_dynamics(rv)
   
   #write_data_to_files_restoration(rv)
 }
-
-
-
 
 # Install and load the future package
 # install.packages("future")
@@ -111,6 +120,7 @@ dat <- expand.grid(n_ind = 1000,
                    max_mutation = 0.05, 
                    sim_nr = 1,
                    f_loss = round(seq(0.05, 0.95, 0.05), 2),
+                   dispersal = c('similar', 'different'),
                    hab_cover = round(seq(0.05, 0.95, 0.05), 2),
                    clustering_restored = c(1, 3, 5))
 
@@ -127,6 +137,7 @@ result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) 
                     dat$mutation_rate[i],
                     dat$max_mutation[i],
                     dat$f_loss[i],
+                    dat$dispersal[i],
                     dat$hab_cover[i],
                     dat$clustering_restored[i])
 }, future.seed = TRUE)
