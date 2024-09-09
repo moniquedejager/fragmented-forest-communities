@@ -18,10 +18,11 @@ simulate_community_dynamics <- function(rv){
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
 
-  while (rv$iteration_nr < 601){
+  while (rv$iteration_nr < 501){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
+      record(rv)
       # print(table(rv$Pm))
       
       # we let each individual reproduce and disperse to a subcommunity:
@@ -100,9 +101,9 @@ simulate_community_dynamics <- function(rv){
     mean_nspecies <- c(mean_nspecies, mn)
     total_species <- c(total_species, length(unique(rv$species)))
     
-    if (length(mean_nspecies) %in% ((1:10)*5)){
-      record(rv)
-    }
+    #if (length(mean_nspecies) %in% ((1:10)*5)){
+      #record(rv)
+    #}
   }
   return(rv)
 } 

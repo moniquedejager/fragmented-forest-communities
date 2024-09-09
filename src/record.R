@@ -20,7 +20,7 @@ record <- function(rv){
                      total_species       = length(unique(rv$species[rv$species > 0])),
                      f_t50_same_subcom   = mean(rv$comm_ID2[rv$comm_type2 == 'sub'] 
                                                 == rv$origin_ID_t50[rv$comm_type2 == 'sub']),
-                     m_Pm                = mean(rv$Pm[rv$comm_type2 == 'sub']))
+                     m_Pm                = mean(rv$Pm[(rv$comm_type2 == 'sub')&(rv$Pm > 0)]))
   
   filename <- paste('results/data per iteration/sim_nr=', rv$sim_nr, 
                     'clustering=', rv$clustering,

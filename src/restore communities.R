@@ -12,7 +12,7 @@ mutation_rate = 0.0003 #0.0001
 max_mutation = 0
 f_loss = 0.95
 dispersal = 'different'
-hab_cover = 0.05
+hab_cover = 1
 clustering_restored = 1
 n_iterations = 50
 
@@ -113,15 +113,16 @@ library(future.apply)
 
 # Create input vectors/lists
 dat <- expand.grid(n_ind = 1000, 
-                   Pm_range = 0.5, 
-                   clustering = c(1,3,5), 
-                   mutation_rate = 0.0001, 
-                   max_mutation = 0.05, 
-                   sim_nr = 1,
-                   f_loss = round(seq(0.05, 0.95, 0.05), 2),
-                   dispersal = c('similar', 'different'),
-                   hab_cover = round(seq(0.05, 0.95, 0.05), 2),
-                   clustering_restored = c(1, 3, 5))
+                   Pm_range = 1, 
+                   clustering = 1, #c(1,3,5), 
+                   mutation_rate = 0.0003, 
+                   max_mutation = 0,  
+                   sim_nr = 2,
+                   f_loss = 0.95, #round(seq(0.05, 0.95, 0.05), 2),
+                   dispersal = 'different', #c('similar', 'different'),
+                   hab_cover = round(c(seq(0.05, 0.95, 0.15), 1), 2),#round(seq(0.05, 0.95, 0.05), 2),
+                   clustering_restored = c(1, 3, 5),
+                   n_iterations = 50)
 
 dat <- dat[round((1 - dat$f_loss),2) <= dat$hab_cover,]
 
@@ -138,6 +139,7 @@ result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) 
                     dat$f_loss[i],
                     dat$dispersal[i],
                     dat$hab_cover[i],
-                    dat$clustering_restored[i])
+                    dat$clustering_restored[i],
+                    dat$n_iterations[i])
 }, future.seed = TRUE)
 
