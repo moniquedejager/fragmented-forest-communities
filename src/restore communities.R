@@ -114,13 +114,13 @@ library(future.apply)
 # Create input vectors/lists
 dat <- expand.grid(n_ind = 1000, 
                    Pm_range = 1, 
-                   clustering = 3, #c(1,3,5), 
+                   clustering = c(1,3,5), 
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
-                   sim_nr = 1:3, #1:10,
+                   sim_nr = 1:10, #1:10,
                    f_loss = 0.95, #round(seq(0.05, 0.95, 0.05), 2),
                    dispersal = 'different', #c('similar', 'different'),
-                   hab_cover = 1, #round(c(seq(0.05, 0.95, 0.15), 1), 2),#round(seq(0.05, 0.95, 0.05), 2),
+                   hab_cover = round(c(seq(0.05, 0.95, 0.15), 1), 2),#round(seq(0.05, 0.95, 0.05), 2),
                    clustering_restored = c(1, 3, 5),
                    n_iterations = 50)
 

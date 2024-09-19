@@ -18,7 +18,7 @@ simulate_community_dynamics <- function(rv){
   total_species   <- vector(length=0)
   rv$iteration_nr <- 0
 
-  while (rv$iteration_nr < 20001){
+  while (rv$iteration_nr < 10001){
     start_time   <- Sys.time()
     rv$origin_ID_t50 <- rv$comm_ID2 
     for (i in 1:50){
