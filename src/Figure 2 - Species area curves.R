@@ -76,13 +76,13 @@ sdf$mu2[sdf$clustering == 3] <- 'Fractal'
 sdf$mu2[sdf$clustering == 5] <- 'Clustered'
 sdf$mu2[sdf$clustering == 0] <- 'Backwards SAR'
 
-sdf$static_dynamic2 <- 'Static'
-sdf$static_dynamic2[sdf$static_dynamic == 'Dynamic'] <- 'Dynamic'
-sdf$static_dynamic2 <- factor(sdf$static_dynamic2, levels=c('Static', 'Dynamic'))
+sdf$static_dynamic2 <- 'Immediately after fragmentation'
+sdf$static_dynamic2[sdf$static_dynamic == 'Dynamic'] <- 'After stabilization'
+sdf$static_dynamic2 <- factor(sdf$static_dynamic2, levels=c('Immediately after fragmentation', 'After stabilization'))
 
-sdf$disp_type <- 'Same dispersal'
-sdf$disp_type[sdf$dispersal_type == 'different'] <- 'Different dispersal'
-sdf$disp_type <- factor(sdf$disp_type, levels = c('Same dispersal', 'Different dispersal'))
+sdf$disp_type <- 'Same Dispersal (SD)'
+sdf$disp_type[sdf$dispersal_type == 'different'] <- 'Different Dispersal (DD)'
+sdf$disp_type <- factor(sdf$disp_type, levels = c('Same Dispersal (SD)', 'Different Dispersal (DD)'))
 
 pd <- position_dodge(0.01) 
 ggplot(sdf, aes(x=area_size, y=n_species, color=mu2)) + 
@@ -110,7 +110,7 @@ p1 <- ggplot(sdf, aes(x=hab_loss, y=n_species, color=mu2)) +
   #scale_x_continuous(trans='log10') + 
   #scale_y_continuous(trans='log10') + 
   scale_color_manual(values = c('grey40', "#F8766D", "#00BA38", "#619CFF")) + 
-  facet_grid(cols=vars(disp_type), rows=vars(static_dynamic2)) + 
+  facet_grid(cols=vars(disp_type), rows=vars(static_dynamic2), scales = 'free_y') + 
   xlab('% Habitat loss') + 
   ylab('Total # species') +
   theme_bw() + 
