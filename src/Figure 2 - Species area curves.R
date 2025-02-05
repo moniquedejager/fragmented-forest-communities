@@ -76,9 +76,9 @@ sdf$mu2[sdf$clustering == 3] <- 'Fractal'
 sdf$mu2[sdf$clustering == 5] <- 'Clustered'
 sdf$mu2[sdf$clustering == 0] <- 'Backwards SAR'
 
-sdf$static_dynamic2 <- 'Immediately after fragmentation'
+sdf$static_dynamic2 <- 'Immediately after habitat loss'
 sdf$static_dynamic2[sdf$static_dynamic == 'Dynamic'] <- 'After stabilization'
-sdf$static_dynamic2 <- factor(sdf$static_dynamic2, levels=c('Immediately after fragmentation', 'After stabilization'))
+sdf$static_dynamic2 <- factor(sdf$static_dynamic2, levels=c('Immediately after habitat loss', 'After stabilization'))
 
 sdf$disp_type <- 'Same Dispersal (SD)'
 sdf$disp_type[sdf$dispersal_type == 'different'] <- 'Different Dispersal (DD)'
@@ -118,13 +118,38 @@ p1 <- ggplot(sdf, aes(x=hab_loss, y=n_species, color=mu2)) +
         strip.placement = "outside", 
         strip.background = element_blank(),
         legend.title=element_blank())
-
+p1
 # tiff file 600 dpi:
 tiff(filename = 'figures/Figure 2.tif', 
      width = 5, height = 5, units = 'in', res = 600)
 p1
 dev.off()
 
+# Without Backwards SAR for presentation:
+pd <- position_dodge(0.1) 
+sdf$hab_loss <- (1 - sdf$area_size/400)*100
+sel <- sdf$mu2 != 'Backwards SAR'
+p1 <- ggplot(sdf[sel,], aes(x=hab_loss, y=n_species, color=mu2)) + 
+  geom_errorbar(aes(ymin=n_species-sd, ymax=n_species+sd), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  #scale_x_continuous(trans='log10') + 
+  #scale_y_continuous(trans='log10') + 
+  scale_color_manual(values = c("#F8766D", "#00BA38", "#619CFF")) + 
+  facet_grid(cols=vars(disp_type), rows=vars(static_dynamic2), scales = 'free_y') + 
+  xlab('% Habitat loss') + 
+  ylab('Total # species') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank())
+p1
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 2 without backwards SAR.tif', 
+     width = 5, height = 5, units = 'in', res = 600)
+p1
+dev.off()
 
 
 range(sdf$area_size)

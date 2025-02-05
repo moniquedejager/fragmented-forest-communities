@@ -104,3 +104,49 @@ tiff(filename = 'figures/Figure 4.tif',
 p1
 dev.off()
 
+# For presentation: 
+sel <- sdf$ylab == '# Species per subcommunity'
+p1 <- ggplot(sdf[sel,], aes(x=f_loss * 100, y=y, color=mu2)) + 
+  geom_errorbar(aes(ymin=y-ci, ymax=y+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(cols=vars(disp_type), rows=vars(ylab), scales='free_y', switch='y') + 
+  xlab('% Habitat loss') + 
+  ylab('') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank(), 
+        plot.margin = unit(c(0.1, 0.2, 0.1, 0.1), "inches"),
+        panel.spacing.x = unit(1, "lines"))
+p1
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 4 no species only.tif', 
+     width = 5, height = 3, units = 'in', res = 600)
+p1
+dev.off()
+
+sel <- sdf$ylab == '% Ancestors from elsewhere'
+p1 <- ggplot(sdf[sel,], aes(x=f_loss * 100, y=y, color=mu2)) + 
+  geom_errorbar(aes(ymin=y-ci, ymax=y+ci), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  facet_grid(cols=vars(disp_type), rows=vars(ylab), scales='free_y', switch='y') + 
+  xlab('% Habitat loss') + 
+  ylab('') +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank(),
+        legend.title=element_blank(), 
+        plot.margin = unit(c(0.1, 0.2, 0.1, 0.1), "inches"),
+        panel.spacing.x = unit(1, "lines"))
+p1
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 4 connectivity only.tif', 
+     width = 5, height = 3, units = 'in', res = 600)
+p1
+dev.off()
