@@ -49,3 +49,10 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+data/
+figures/
+results/
+Fragmented-forest-communities/community composition/
+Fragmented-forest-communities/Fragment.d7222131/
+Fragmented-forest-communities/x64/
