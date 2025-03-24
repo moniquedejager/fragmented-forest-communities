@@ -271,9 +271,9 @@ void remove_habitat_patches()
 		{
 			for (int j = 0; j < ny; ++j)
 			{
-				if ((ix == i) && (iy == j))
+				if (h[i][j] == 1)
 				{
-					w[ix][iy] = 0;
+					w[i][j] = 0;
 				}
 				else {
 					double distance = sqrt(pow(ix - i, 2) + pow(iy - j, 2));
@@ -300,19 +300,24 @@ void remove_habitat_patches()
 			sumW = sumW - w[ix][iy];
 		}
 
+		if (h[ix][iy] == 1) { cout << "Error in line 303: this was already a habitat patch (" << ix << ", " << iy << ")" << endl; }
+
 		h[ix][iy] = 1;
 		++n_patches;
 
 		//cout << ix << ", " << iy << ", " << n_patches << endl;
 	}
 
+	n_patches = 0;
 	for (int i = 0; i < nx; ++i)
 	{
 		for (int j = 0; j < ny; ++j)
 		{
 			patch_type[i][j] = h[i][j];
+			if (h[i][j] == 1) { ++n_patches; }
 		}
 	}
+	cout << "there are " << n_patches << " habitat patches left." << endl;
 }
 
 void simulate_community_dynamics()

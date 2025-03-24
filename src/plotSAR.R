@@ -102,9 +102,9 @@ ggplot(SAR[(SAR$Species > 0)&(SAR$f_loss < 1),], aes(x=Area, y=Species, color=fa
   #geom_point() + 
   geom_line() + 
   facet_wrap(vars(loss)) + 
-  scale_x_continuous(trans='log10') + 
-  scale_y_continuous(trans='log10') + 
-  scale_color_viridis_d() + 
+  #scale_x_continuous(trans='log10') + 
+  #scale_y_continuous(trans='log10') + 
+  scale_color_viridis_d(direction=-1) + 
   xlab('Area size (km2)') + 
   ylab('Number of species') + 
   theme_bw() + 
