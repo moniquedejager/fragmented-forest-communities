@@ -45,7 +45,9 @@ const int n = 2025;                // total number of patches
 const int n_ind = 1000;            // number of individuals per patch
 const double mut_rate = 0.0003;    // mutation rate / probability of seedling coming from metacommunity
 const bool different_dispersal = true; // whether species have different dispersal capacities, or similar ones
-bool initialization = false; // whether this is an initialization simulation or not
+bool initialization = false;       // whether this is an initialization simulation or not
+int n_species = 1000;              // the total number of species 
+int n_iterations = 10000;             // number of iterations (10.000)
 
 // parameters for habitat loss and fragmentation: 
 double clustering = 2.0;           // the level of clustering of habitat patches (1 = random distribution, 5 = highly clustered)
@@ -103,6 +105,10 @@ void initialize()
 	if (initialization)
 	{
 		// initialize patch type and species ID numbers of initialization simulation:
+
+		std::random_device rd;
+		std::mt19937 gen{ rd() };
+		uniform_int_distribution<int> int_dist(1, n_species);
 		for (int i = 0; i < nx; ++i)
 		{
 			for (int j = 0; j < ny; ++j)
@@ -110,8 +116,9 @@ void initialize()
 				patch_type[i][j] = 1;
 				for (int k = 0; k < n_ind; ++k)
 				{
-					species[i][j][k] = k + 1;
-					species_new[i][j][k] = k + 1;
+					int spec = int_dist(gen) % (n_species + 1);
+					species[i][j][k] = spec;
+					species_new[i][j][k] = spec;
 				}
 			}
 		}
@@ -191,7 +198,7 @@ void readParamValues()
 
 	while (simNumber > 0)
 	{
-		inFile >> sim_nr >> f_loss >> clustering >> initialization;
+		inFile >> sim_nr >> f_loss >> clustering >> initialization >> n_species;
 		--simNumber;
 	}
 	
@@ -202,7 +209,7 @@ void readParamValues()
 void record_subcommunities()
 {
 	ofstream outfile;
-	string filename = "./community composition/composition" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_" + doubleToString(f_loss) + ".txt";
+	string filename = "./community composition/composition" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_" + doubleToString(f_loss) + "_" + doubleToString(n_species) + ".txt";
 	outfile.open(filename, std::ios_base::app);
 
 	for (int i = 0; i < nx; ++i) 
@@ -211,7 +218,7 @@ void record_subcommunities()
 		{
 			if (patch_type[i][j] == 1)
 			{
-				vector<int> n_per_species(1000, 0);
+				vector<int> n_per_species(n_species, 0);
 				vector<int> spec = species[i][j];
 
 				for (int k = 0; k < n_ind; ++k)
@@ -221,7 +228,7 @@ void record_subcommunities()
 					n_per_species[a] += 1;
 				}
 
-				for (int k = 0; k < n_ind; ++k)
+				for (int k = 0; k < n_species; ++k)
 				{
 					//cout << i << " ; " << j << " ; " << spec[k] << endl;
 					if (n_per_species[k] > 0)
@@ -329,8 +336,9 @@ void simulate_community_dynamics()
 	std::mt19937 gen{ rd() };
 	uniform_real_distribution<double> dist(0.0, 1.0);
 	uniform_int_distribution<int> int_dist(0, n_ind - 1);
+	uniform_int_distribution<int> int_dist2(1, n_species);
 
-	for (int iteration = 0; iteration < 10000; ++iteration)
+	for (int iteration = 0; iteration < n_iterations; ++iteration)
 	{
 		// every iteration, each individual (in random order) gets a chance to reproduce and disperse offspring.
 		// old species ID per location will be written to species from species_new, 
@@ -351,33 +359,24 @@ void simulate_community_dynamics()
 		}
 
 		// randomly select subcommunities and shuffle the order of individuals. Let them reproduce in that order.
-		int n_left = n;
-		while (n_left > 0)
+		for (int i = 1; i < n; ++i)
 		{
 			int ix = int_dist(gen) % nx;
 			int iy = int_dist(gen) % ny;
 
-			if (patch_type[ix][iy] == 0) 
-			{ 
-				//cout << patch_type[ix][iy] << ", " << ix << ", " << iy << ", " << reproduced[ix][iy] << ", " << n_left << endl;
-				reproduced[ix][iy] = true; 
-				--n_left;
-			}
-
-			while ((reproduced[ix][iy])&&(n_left > 0))
+			while (reproduced[ix][iy])
 			{
 				ix = (ix + 1) % nx;
 				if (ix == 0) iy = (iy + 1) % ny;
-
-				if (patch_type[ix][iy] == 0)
-				{
-					//cout << patch_type[ix][iy] << ", " << ix << ", " << iy << ", " << reproduced[ix][iy] << ", " << n_left << endl;
-					reproduced[ix][iy] = true;
-					--n_left;
-				}
 			}
 
-			if (reproduced[ix][iy] == false) {
+			if (patch_type[ix][iy] == 0)
+			{
+				//cout << patch_type[ix][iy] << ", " << ix << ", " << iy << ", " << reproduced[ix][iy] << ", " << n_left << endl;
+				reproduced[ix][iy] = true;
+
+			}
+			else {
 				// reorder individuals in subcommunity for reproduction order:
 				vector<int> a = species[ix][iy];
 
@@ -387,7 +386,7 @@ void simulate_community_dynamics()
 				for (int k = 0; k < n_ind; ++k)
 				{
 					double x = dist(gen);
-					double lambda = static_cast<double>(a[k]) / n_ind;
+					double lambda = static_cast<double>(a[k]) / n_species;
 					double dist_val = log10(x) / (-1 * lambda);
 					double alpha = dist(gen) * 2.0 * PI;
 
@@ -408,14 +407,14 @@ void simulate_community_dynamics()
 					// there's a small chance that an individual comes in from the metacommunity:
 					if (dist(gen) <= mut_rate)
 					{
-						species_new[new_x][new_y][r_ind] = int_dist(gen) + 1;
+						species_new[new_x][new_y][r_ind] = int_dist2(gen);
 					}
 				}
 				reproduced[ix][iy] = true;
-				--n_left;
 			}
+			
 		}
-		//cout << "iteration number = " << iteration << endl;
+		cout << "iteration number = " << iteration << endl;
 	}
 }
 

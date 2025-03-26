@@ -55,7 +55,6 @@ for (j in 1:length(filenames))
   }
 }
 
-
 # load in data from the SAR files:
 filenames <- list.files('Fragmented-forest-communities/x64/Release/community composition/')
 
@@ -81,15 +80,17 @@ for (j in 1:length(filenames))
     dat        <- unlist(strsplit(dat, '_'))
     clustering <- as.numeric(dat[1])
     sim_nr     <- as.numeric(dat[2])
-    dat        <- gsub(".txt", "", dat[3])
-    f_loss     <- as.numeric(dat)
-    
+    f_loss     <- as.numeric(dat[3])
+    dat        <- gsub(".txt", "", dat[4])
+    n_species  <- as.numeric(dat)
+
     SAR2 <- data.frame(Area = df$Area,
                        Hab_area = df$Hab_area,
                        Species = df$Species,
                        clustering = clustering,
                        sim_nr     = sim_nr,
-                       f_loss     = f_loss)
+                       f_loss     = f_loss,
+                       n_species  = n_species)
     SAR <- rbind(SAR, SAR2)
   }
 }
@@ -102,10 +103,9 @@ SAR$loss <- factor(SAR$loss, levels=unique(SAR$loss))
 SAR$mu   <- paste('μ = ', SAR$clustering, sep='')
 SAR$mu   <- factor(SAR$mu, levels=unique(SAR$mu))
 
-p <- ggplot(SAR[(SAR$Species > 0)&(SAR$sim_nr < 6),], aes(x=Area, y=Species, color=factor(sim_nr))) + 
+p <- ggplot(SAR[(SAR$Species > 0)&(SAR$sim_nr < 6),], aes(x=Area, y=Species, color=factor(n_species))) + 
   #geom_point() + 
   geom_line() + 
-  facet_grid(cols=vars(loss), rows=vars(mu)) + 
   #scale_x_continuous(trans='log10') + 
   #scale_y_continuous(trans='log10') + 
   scale_color_viridis_d(direction=-1) + 
@@ -189,6 +189,7 @@ SAR2 <- rbind(SAR2, sar2)
 
 ggplot(SAR2[SAR2$Hab_area <= 15,], aes(x=Hab_area, y=Species, color=type)) + 
   geom_line()  
-  scale_x_continuous(trans='log10') + 
+scale_x_continuous(trans='log10') + 
   scale_y_continuous(trans='log10')
+
 
