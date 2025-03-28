@@ -26,7 +26,7 @@ params <- data.frame(simNumber = 1,
                      f_loss = 0,
                      clustering = 1,
                      initialization = 1,
-                     n_species = (3:10)*1000)
+                     n_species = (3:10)*5000)
 
 end_file <- data.frame(simNumber = -1, 
                        f_loss = -1, 
