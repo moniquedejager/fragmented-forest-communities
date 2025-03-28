@@ -390,6 +390,8 @@ void simulate_community_dynamics()
 					double dist_val = log10(x) / (-1 * lambda);
 					double alpha = dist(gen) * 2.0 * PI;
 
+					cout << lambda << ", " << dist_val << endl;
+
 					int new_x = (ix + static_cast<int>(round(dist_val * cos(alpha)))) % nx;
 					int new_y = (iy + static_cast<int>(round(dist_val * sin(alpha)))) % ny;
 
