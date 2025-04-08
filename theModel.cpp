@@ -8,7 +8,7 @@
   and habitat loss. For full details on the model, see De Jager et
   # al. (in prep.).
 
-  Latest version created: 2025-03-19, by Monique de Jager */
+  Latest version created: 2025-04-02, by Monique de Jager */
 
 #include <iostream>
 #include <sstream>
@@ -33,21 +33,26 @@ using namespace std;
 void initialize();
 void readSimNumber();
 void readParamValues();
+void record_one_subcommunity(int iteration);
 void record_subcommunities();
 void remove_habitat_patches();
 void simulate_community_dynamics(); 
-void terminateProgram();           // Stops program termination until you have pressed a key 
+void terminateProgram();               // Stops program termination until you have pressed a key 
 
 // global parameters:
-const int nx = 45;                 // number of patches in x-direction
-const int ny = 45;                 // number of patches in y-direction
-const int n = 2025;                // total number of patches
-const int n_ind = 1000;            // number of individuals per patch
-const double mut_rate = 0.0003;    // mutation rate / probability of seedling coming from metacommunity
+const int nx = 45;                     // number of patches in x-direction
+const int ny = 45;                     // number of patches in y-direction
+const int n = 2025;                    // total number of patches
+const int n_ind = 1000;                // number of individuals per patch
+double mut_rate = 0.002;               // mutation rate / probability of seedling coming from metacommunity
 const bool different_dispersal = true; // whether species have different dispersal capacities, or similar ones
-bool initialization = false;       // whether this is an initialization simulation or not
-int n_species = 1000;              // the total number of species 
-int n_iterations = 10000;             // number of iterations (10.000)
+bool initialization = false;           // whether this is an initialization simulation or not
+int n_species = 5500;                  // the total number of species 
+int n_iterations = 10000;              // number of iterations (10.000)
+double H = 6.5;                        // Upper limit (in pacthes) of bounded pareto distribution that describes the dispersal kernel
+double L = 0.01;                       // Lower limit (in pacthes) of bounded pareto distribution that describes the dispersal kernel
+int record_x = 0;                      // The ID number of the subcommunity that we will follow when record is set to true
+int record_y = 0;
 
 // parameters for habitat loss and fragmentation: 
 double clustering = 2.0;           // the level of clustering of habitat patches (1 = random distribution, 5 = highly clustered)
@@ -62,7 +67,8 @@ vector<vector<vector<int>>> species_new(nx, vector<vector<int>>(ny, vector<int>(
 // simulation number:
 int simNumber = 2;		// number of the row of parameter values to pick from 
 int sim_nr = 1;			// number of the simulation run for a set of parameters (1 to 10)
-bool simulate = true;   // whether we should continue simulations with the next set of parameters 
+bool simulate = true;   // whether we should continue simulations with the next set of parameters
+bool record = false;     // whether we should record the last 100 iterations of a random patch
 
 //////////////////////////////////////////////////////////////////////////////
 // main program:
@@ -82,6 +88,7 @@ int main()
 		{
 			initialize();
 			if (initialization == FALSE) { remove_habitat_patches(); }
+			
 			simulate_community_dynamics();
 			record_subcommunities();
 		}
@@ -127,7 +134,8 @@ void initialize()
 		// initialize subcommunities using existing initialized data:
 
 		// read in the subcommunities (x, y, species, number of individuals):
-		string filename = "./community composition/composition" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_0.00.txt";
+		string filename = "./community composition/composition1.00_" + doubleToString(sim_nr) + "_0.00_" + doubleToString(n_species) + "_" + doubleToString(mut_rate * 1000.0) + "_" + doubleToString(H) + ".txt";
+
 		cout << filename << endl;
 		ifstream inFile;
 		inFile.open(filename, ios::in);
@@ -198,7 +206,7 @@ void readParamValues()
 
 	while (simNumber > 0)
 	{
-		inFile >> sim_nr >> f_loss >> clustering >> initialization >> n_species;
+		inFile >> sim_nr >> f_loss >> clustering >> initialization >> n_species >> mut_rate >> H;
 		--simNumber;
 	}
 	
@@ -206,10 +214,38 @@ void readParamValues()
 	n_patches2 = int(round(n * (1 - f_loss)));
 }
 
+void record_one_subcommunity(int iteration) 
+{
+	// record 100 iterations of one subcommunity
+	ofstream outfile;
+	string filename = "./record one subcommunity/simulation_" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_" + doubleToString(f_loss) + "_" + doubleToString(n_species) + "_" + doubleToString(mut_rate * 1000.0) + "_" + doubleToString(H) + ".txt";
+	outfile.open(filename, std::ios_base::app);
+	
+	vector<int> n_per_species(n_species, 0);
+	vector<int> spec = species[record_x][record_y];
+
+	for (int k = 0; k < n_ind; ++k)
+	{
+		int a = spec[k] - 1;
+		//cout << a << ", " << spec[k] << endl;
+		n_per_species[a] += 1;
+	}
+
+	for (int k = 0; k < n_species; ++k)
+	{
+		//cout << i << " ; " << j << " ; " << spec[k] << endl;
+		if (n_per_species[k] > 0)
+		{
+			outfile << iteration << "	" << k + 1 << "	" << n_per_species[k] << endl;
+		}
+	}
+	outfile.close();
+}
+
 void record_subcommunities()
 {
 	ofstream outfile;
-	string filename = "./community composition/composition" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_" + doubleToString(f_loss) + "_" + doubleToString(n_species) + ".txt";
+	string filename = "./community composition/composition" + doubleToString(clustering) + "_" + doubleToString(sim_nr) + "_" + doubleToString(f_loss) + "_" + doubleToString(n_species) + "_" + doubleToString(mut_rate*1000.0) + "_" + doubleToString(H) + ".txt";
 	outfile.open(filename, std::ios_base::app);
 
 	for (int i = 0; i < nx; ++i) 
@@ -329,15 +365,15 @@ void remove_habitat_patches()
 
 void simulate_community_dynamics()
 {
-	// simulate community dynamics: replace individuals in the subcommunities: 
-	cout << "simulate community dynamics" << endl;
-
 	std::random_device rd;
 	std::mt19937 gen{ rd() };
 	uniform_real_distribution<double> dist(0.0, 1.0);
 	uniform_int_distribution<int> int_dist(0, n_ind - 1);
 	uniform_int_distribution<int> int_dist2(1, n_species);
 
+	// simulate community dynamics: replace individuals in the subcommunities: 
+	cout << "simulate community dynamics" << endl;
+	
 	for (int iteration = 0; iteration < n_iterations; ++iteration)
 	{
 		// every iteration, each individual (in random order) gets a chance to reproduce and disperse offspring.
@@ -386,11 +422,11 @@ void simulate_community_dynamics()
 				for (int k = 0; k < n_ind; ++k)
 				{
 					double x = dist(gen);
-					double lambda = static_cast<double>(a[k]) / n_species;
-					double dist_val = log10(x) / (-1 * lambda);
+					double lambda = static_cast<double>(a[k] + 1.00) / n_species;
+					double dist_val = pow((1 - x * (1 - pow((L / H), lambda))) / pow(L, lambda), -1 / lambda);
 					double alpha = dist(gen) * 2.0 * PI;
 
-					cout << lambda << ", " << dist_val << endl;
+					//cout << lambda << ", " << dist_val << endl;
 
 					int new_x = (ix + static_cast<int>(round(dist_val * cos(alpha)))) % nx;
 					int new_y = (iy + static_cast<int>(round(dist_val * sin(alpha)))) % ny;
@@ -414,9 +450,16 @@ void simulate_community_dynamics()
 				}
 				reproduced[ix][iy] = true;
 			}
-			
 		}
 		cout << "iteration number = " << iteration << endl;
+
+		if (record == TRUE)
+		{
+			if (iteration >= (n_iterations - 100))
+			{
+				record_one_subcommunity(iteration);
+			}
+		}
 	}
 }
 
