@@ -1,6 +1,6 @@
 # create the input file for the simulations in C++:
-params <- expand.grid(simNumber = 1:5, 
-                      f_loss = 0:9/10,
+params <- expand.grid(simNumber = 2:5, 
+                      f_loss = 1:9/10,
                       clustering = seq(1, 5, 0.5))
 params$initialization = 0
 params$initialization[params$f_loss == 0] = 1

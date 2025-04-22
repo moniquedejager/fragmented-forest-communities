@@ -167,9 +167,9 @@ clustering = 1
 sel = (SAR$f_loss == loss)&(SAR$clustering == clustering)&(SAR$sim_nr == sim_nr)
 
 sar1 <- meteSAR(Amin=0.025, 
-                A0=15, 
-                S0=max(SAR$Species[(sel)&(SAR$Hab_area <= 15)]), 
-                N0=15/0.025 * 1000)
+                A0=50, 
+                S0=max(SAR$Species[(sel)&(SAR$Hab_area <= 51)]), 
+                N0=50/0.025 * 1000)
 plot(sar1$pred$A, sar1$pred$S)
 
 SAR2 <- SAR[sel,]
@@ -187,7 +187,7 @@ sar2$mu   <- paste('μ = ', sar2$clustering, sep='')
 
 SAR2 <- rbind(SAR2, sar2)
 
-ggplot(SAR2[SAR2$Hab_area <= 15,], aes(x=Hab_area, y=Species, color=type)) + 
+ggplot(SAR2[SAR2$Hab_area <= 51,], aes(x=Hab_area, y=Species, color=type)) + 
   geom_line()  
   scale_x_continuous(trans='log10') + 
   scale_y_continuous(trans='log10')
