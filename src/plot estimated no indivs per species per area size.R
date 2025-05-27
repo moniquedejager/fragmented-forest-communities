@@ -64,6 +64,9 @@ df2 <- plot_relation(filename)
 
 plot_relation2 <- function(filename)
 {
+  patchID1 <- paste(sort(rep(0:44, 45)), rep(0:44, 45), sep='-')
+  codes    <- read.table('results/SARgroupcodes.txt') 
+  
   filename2 <- paste('Fragmented-forest-communities/x64/Release/community composition/', filename, sep='')
   
   df        <- read.table(filename2)
@@ -74,16 +77,38 @@ plot_relation2 <- function(filename)
   n0 <- tapply(df$n, as.factor(df$species), sum)
   species <- tapply(df$species, as.factor(df$species), mean)
   
-  # let's continue with the only the most abundant species:
-  df <- df[df$species == species[n0 == max(n0)],]
-  df$n0 <- max(n0)  
+  # let's continue with only the most abundant species:
+  #df <- df[df$species == species[n0 == max(n0)],]
+  #df$n0 <- max(n0)  
   
   patchID  <- unique(paste(df$x, df$y, sep='-'))
   df$patch <- paste(df$x, df$y, sep='-')
-  A0       <- length(patchID)
+
+  # per species per patch:
+  
+  # hier moet ik verder mee, maar heb nu niet de mentale capaciteit :(
+  # wat ik wil laten zien is de relatie tussen 1. a/A (hoeveelheid habitat 
+  # per hoeveelheid gebied) en 2. n / (n0 * A/A0) (oftewel: het werkelijke 
+  # aantal individuen per geschatte aantal individuen). En dit alles per soort, 
+  # en voor 12 verschillende groepsgroottes (van 1 patch tot de helft van het
+  # totale gebied bij elkaar). Dit levert een hele hoop datapunten op per 
+  # simulatie, en dus nog veel meer als we alle simulaties bij elkaar zetten. 
+  # Daar moet ik dus ook nog een oplossing voor vinden. Maar ja, mijn hoofd doet
+  # het vandaag even niet... Veel succes hiermee, mezelf in de toekomst :)
+  
+  
+  a <- A0 / 2025   # average habitable area size
+  A <- 1
+  n <- tapply(df$n[sel], as.factor(df$species[sel]), sum)
+  n <- n / 2025
+  n0<- tapply(df$n0[sel], as.factor(df$species[sel]), mean)
+  
+  
+  
   
   # create a dataframe where we increment the area size: 
-  df2 <- data.frame(A  = 1,
+  df2 <- data.frame(a  = 1,
+                    A  = (1:2025)[patchID1 == patchID[1]],
                     n  = df$n[df$patch == patchID[1]],
                     n0 = df$n0[df$patch == patchID[1]])
   areas <- c(0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4, 12.8, 25.6)/0.025
@@ -92,8 +117,9 @@ plot_relation2 <- function(filename)
     n    <- tapply(df$n[sel], as.factor(df$species[sel]), sum)
     spec <- tapply(df$species[sel], as.factor(df$species[sel]), mean)
     n0   <- tapply(df$n0[sel], as.factor(df$species[sel]), mean)
-    # hier verder met het berekenen van n0 per species
-    df2a <- data.frame(A = i,
+
+    df2a <- data.frame(a = i,
+                       A  = (1:2025)[patchID1 == patchID[i]],
                        n = n,
                        n0 = n0)
     df2 <- rbind(df2, df2a)
@@ -161,7 +187,7 @@ for (j in 1:length(filenames))
       df_gof2 <- data.frame(clustering = clustering,
                             sim_nr     = sim_nr,
                             f_loss     = f_loss,
-                            A          = GOF)
+                            GOF        = GOF)
       df_gof <- rbind(df_gof, df_gof2)
     }
   }
