@@ -1,4 +1,6 @@
 results/
+figures/
+Fragmented-forest-communities/
 
 # History files
 .Rhistory
