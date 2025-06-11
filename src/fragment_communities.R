@@ -5,7 +5,8 @@ fragment_community <- function(n_ind,
                               mutation_rate, 
                               max_mutation,
                               f_loss,
-                              dispersal){
+                              dispersal,
+                              disp_kernel){
   # We simulated subcommunity dynamics in a 2-dimensional, semi-spatial, 
   # near-neutral, individual-based model. The environment consists of 20 x 20 
   # cells, each cell having a subcommunity of 1,000 individuals. Initially, 
@@ -35,7 +36,8 @@ fragment_community <- function(n_ind,
              mutation_rate = mutation_rate,
              max_mutation  = max_mutation,
              f_loss        = f_loss,
-             dispersal     = dispersal)
+             dispersal     = dispersal,
+             disp_kernel   = disp_kernel)
              
   # position the cells in the lattice:
   rv$x <- rep(1:rv$nx, rv$ny)
@@ -63,12 +65,13 @@ fragment_community <- function(n_ind,
     m <- read.table('results/community_composition/initial_community_dif.txt')
     m <- as.vector(t(as.matrix(m)))
     m2  <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2 - 1])
-    rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
+    #rv$Pm     <- as.numeric(unlist(strsplit(m, '-'))[(1:(length(m)))*2])
     rv$species <- m2
+    rv$Pm      <- ceiling(rv$species/(rv$n_ind/10))/10 * rv$Pm_range
   }
   
   # we furthermore need to define the local neighborhood per cell
-  rv$dx   <- rep(-5:5, 11)
+  rv$dx   <- rep(-10:10, 21)
   rv$dy   <- sort(rv$dx)
   rv$dist <- sqrt(rv$dx^2 + rv$dy^2)
   
@@ -98,13 +101,25 @@ library(future.apply)
 
 # Create input vectors/lists
 dat <- expand.grid(n_ind = 1000, 
-                   Pm_range = 1, 
-                   clustering = c(1,3,5), 
+                   Pm_range = c(0.5, 1, 1.5), 
+                   clustering = c(1,5), 
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
-                   sim_nr = 1:10,
-                   f_loss = round(seq(0, 0.95, 0.05), 2),
-                   dispersal = c('similar', 'different'))
+                   sim_nr = 2:5,
+                   f_loss = c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
+                   dispersal = 'different',  #c('similar', 'different'))
+                   disp_kernel = 'exponential')
+
+dat2 <- expand.grid(n_ind = 1000, 
+                    Pm_range = 1, 
+                    clustering = c(1,5), 
+                    mutation_rate = 0.0003, 
+                    max_mutation = 0,  
+                    sim_nr = 1:5,
+                    f_loss = c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
+                    dispersal = 'different',  #c('similar', 'different'))
+                    disp_kernel = c('pareto', 'gaussian'))
+dat <- rbind(dat, dat2)
 
 # Set up parallel processing with future
 plan(multisession, workers = 10)  # Adjust the number of workers based on your system
@@ -117,6 +132,7 @@ result_parallel <- future.apply::future_lapply(1:length(dat$n_ind), function(i) 
                     dat$mutation_rate[i],
                     dat$max_mutation[i],
                     dat$f_loss[i],
-                    dat$dispersal[i])
+                    dat$dispersal[i],
+                    dat$disp_kernel[i])
 }, future.seed = TRUE)
 

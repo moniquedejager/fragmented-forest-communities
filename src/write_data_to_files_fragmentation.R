@@ -57,7 +57,8 @@ write_data_to_files_fragmentation <- function(rv){
                    Pm         = Pm)
   
   filename <- paste('./results/subcommunity_data/fragmented_subcommunity_data_',
-                    rv$f_loss, '.txt', sep='')
+                    rv$f_loss, '_maxLambda=', rv$Pm_range,'_dispKernel=', 
+                    rv$disp_kernel,'.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
   } else {
@@ -76,7 +77,8 @@ write_data_to_files_fragmentation <- function(rv){
                    distance      = dissimilarity[,1],
                    dissimilarity = dissimilarity[,2])
   filename <- paste('./results/dissimilarity/dissimilarity_data_',
-                    rv$sim_nr, '.txt', sep='')
+                    rv$sim_nr, '_maxLambda=',rv$Pm_range,'_dispKernel=', 
+                    rv$disp_kernel,'.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
   } else {
@@ -97,7 +99,8 @@ write_data_to_files_fragmentation <- function(rv){
                    static_n_species = rv$static_n_species)
   
   filename <- paste('./results/simulation_data/fragmented_simulation_data_',
-                    rv$f_loss, '.txt', sep='')
+                    rv$f_loss, '_maxLambda=', rv$Pm_range, '_dispKernel=', 
+                    rv$disp_kernel,'.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
   } else {
@@ -119,7 +122,8 @@ write_data_to_files_fragmentation <- function(rv){
                          disp_cap      = disp,
                          perc_indiv    = p_disp)
   filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_',
-                    rv$f_loss, '.txt', sep='')
+                    rv$f_loss, '_maxLambda=', rv$Pm_range,'_dispKernel=', 
+                    rv$disp_kernel,'.txt', sep='')
   if (file.exists(filename)){
     write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
   } else {
@@ -142,6 +146,7 @@ write_data_to_files_fragmentation <- function(rv){
   
   filename <- paste('./results/community_composition/', rv$dispersal,
                     rv$clustering,'_',rv$sim_nr, '_',rv$f_loss, 
-                    '_', rv$mutation_rate,'_', rv$max_mutation,'.txt', sep='')
+                    '_', rv$mutation_rate,'_', rv$max_mutation, '_maxLambda=', rv$Pm_range,'_dispKernel=', 
+                    rv$disp_kernel,'.txt', sep='')
   write.table(df, filename, append=TRUE, col.names = FALSE, row.names = FALSE)
 }

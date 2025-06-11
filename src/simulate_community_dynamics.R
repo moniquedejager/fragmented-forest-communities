@@ -32,13 +32,35 @@ simulate_community_dynamics <- function(rv){
       # Per Pm value, select all individuals with this value and randomly 
       # select the subcommunity to reproduce and disperse to and the random
       # individual to replace in this subcommunity
-      r_comm <- rep(61, rv$tot2) # 61 is the focal subcommunity
+      r_comm <- rep(ceiling(length(rv$dx)/2), rv$tot2) # the focal subcommunity
+      
       r_ind  <- sample(1:rv$n_ind, rv$tot2, replace=TRUE)
+      
+      lmin <- 1 # parameter for 2-D pareto distribution
+      lmax <- 20 # parameter for 2-D pareto distribution
+      
       for (iPm in unique(Pm[Pm > 0])) {
         sel <- Pm == iPm
-        Pm2 <- (2*pi*iPm^2)^-1 * exp(-1*rv$dist / iPm) 
+        
+        if (rv$disp_kernel == 'exponential'){
+          # 2-D exponential dispersal kernel:
+          Pm2 <- (2*pi*iPm^2)^-1 * exp(-1*rv$dist / iPm) 
+        }
+        if (rv$disp_kernel == 'pareto'){
+          # 2-D truncated pareto dispersal kernel:
+          mu <- 1/iPm
+          mu[mu == 2] <- 2.001
+          
+          Pm2 <- 1/(2*pi) * (2 - mu)/(lmax^(2-mu) - lmin^(2-mu)) * (rv$dist+1)^(-mu)
+        }
+        if (rv$disp_kernel == 'gaussian'){
+          # 2-D gaussian dispersal kernel:
+          Pm2 = 1/(2*pi) * 
+            exp(-1/2 * ((rv$dx/(iPm*2))^2 + (rv$dy/(iPm*2))^2))
+        }
+        
         Pm2 <- Pm2 / sum(Pm2)
-        r_comm[sel] <- sample(1:121, sum(sel), replace=TRUE, prob=Pm2)
+        r_comm[sel] <- sample(1:length(rv$dx), sum(sel), replace=TRUE, prob=Pm2)
       }
       x_comm   <- rv$x2 + rv$dx[r_comm]
       y_comm   <- rv$y2 + rv$dy[r_comm]

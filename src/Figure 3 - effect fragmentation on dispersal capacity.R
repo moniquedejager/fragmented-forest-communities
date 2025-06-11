@@ -22,29 +22,37 @@ df <- df[df$dispersal == 'different',]
 sdf <- summarySE(df, measurevar="perc_indiv", 
                  groupvars=c("mu","f_loss", "disp_cap"))
 
-sdf$clustering <- 'Random'
-sdf$clustering[sdf$mu == 3] <- 'Fractal'
-sdf$clustering[sdf$mu == 5] <- 'Clustered'
+sdf$clustering <- 'Random habitat destruction'
+sdf$clustering[sdf$mu == 3] <- 'Fractal habitat destruction'
+sdf$clustering[sdf$mu == 5] <- 'Clustered habitat destruction'
 
 sdf$perc_indiv[sdf$perc_indiv == 0] <- NA
-ggplot(sdf, aes(x=f_loss*100, y=disp_cap, fill=perc_indiv/100)) + 
+p1 <- ggplot(sdf, aes(x=f_loss*100, y=disp_cap, fill=perc_indiv/100)) + 
   geom_raster() + 
   facet_grid(cols = vars(clustering)) + 
   xlab('% Habitat loss') + 
   ylim(c(0, 1)) + 
-  ylab('Dispersal strategy') + 
-  scale_fill_gradientn(colors = c('lightyellow','yellow', 'seagreen', 
-                                  'darkcyan', 'midnightblue'),
+  ylab(expression(paste('Dispersal capacity (', lambda, ')', sep=''))) + 
+  scale_fill_viridis_c(direction = -1,
+  #scale_fill_gradientn(colors = c('lightyellow','yellow', 'seagreen', 
+  #                                'darkcyan', 'midnightblue'),
                        labels = scales::percent_format(),
                        #trans = 'log10',
                        name="% Individuals",
                        na.value = 'transparent',
                        limits=c(0.1, 1)) + 
   theme_bw() + 
-  guides(fill = guide_colorbar(barwidth = 10)) + 
+  guides(fill = guide_colorbar(barwidth = 30)) + 
   theme(legend.position = 'top',
         strip.placement = "outside", 
         strip.background = element_blank())
+p1
+
+# tiff file 600 dpi:
+tiff(filename = 'figures/Figure 3.tif', 
+     width = 8, height = 4, units = 'in', res = 600)
+p1
+dev.off()
 
 max(sdf$perc_indiv)
 
