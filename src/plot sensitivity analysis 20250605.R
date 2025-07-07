@@ -7,7 +7,7 @@ df$maxLambda <- 1
 df$dispKernel <- 'Original'
 df <- df[df$mu == 0,]
 
-for (i in c(0.25, 0.5, 0.75, 0.95)){
+for (i in c(0, 0.25, 0.5, 0.75, 0.95)){
   for (j in c(0.5, 1, 1.5)){
     filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '_maxLambda=', j,'_dispKernel=exponential.txt', sep='')
     if (file.exists(filename)){
@@ -19,7 +19,7 @@ for (i in c(0.25, 0.5, 0.75, 0.95)){
   }
 }
 
-for (i in c(0.25, 0.5, 0.75, 0.95)){
+for (i in c(0, 0.25, 0.5, 0.75, 0.95)){
   for (j in c('pareto', 'gaussian')){
     filename <- paste('results/subcommunity_data/fragmented_subcommunity_data_', i, '_maxLambda=', 1,'_dispKernel=', j, '.txt', sep='')
     if (file.exists(filename)){
@@ -36,9 +36,9 @@ df$dispKernel[df$dispKernel == 'pareto'] <- 'Pareto'
 df$type <- paste(df$dispKernel, ' (0 < λ ≤ ',df$maxLambda, ')',sep='')
 ggplot(df, aes(x=factor(f_loss), y=n_species, color=type)) + 
   geom_violin() + 
-  scale_y_continuous(trans='log10') + 
+  #scale_y_continuous(trans='log10') + 
   facet_wrap(vars(mu))
-ggplot(df, aes(x=factor(f_loss), y=Pm, color=type)) + 
+ggplot(df, aes(x=factor(f_loss), y=(1 - Pm)*100, color=type)) + 
   geom_boxplot() + 
   facet_wrap(vars(mu))
 
@@ -104,7 +104,7 @@ df3$maxLambda <- 1
 df3$dispKernel <- 'Exponential'
 df3 <- df3[df3$mu == 0,]
 
-for (i in c(0.5, 1, 1.5)){
+for (i in c(0, 0.5, 1, 1.5)){
   for (j in c('exponential', 'gaussian', 'pareto')){
     for (k in 1:5){ #1:5
       filename <- paste('results/dissimilarity/dissimilarity_data_', k, 
@@ -162,7 +162,7 @@ df$maxLambda <- 1
 df$dispKernel <- 'Original'
 df <- df[df$mu == 0,]
 
-for (i in c(0.25, 0.5, 0.75, 0.95)){
+for (i in c(0, 0.25, 0.5, 0.75, 0.95)){
   for (j in c('exponential', 'gaussian', 'pareto')){
     for (k in c(0.5, 1, 1.5)){
       filename <- paste('./results/dispersal_capacity/fragmented_dispersal capacity_data_', i, 
@@ -221,7 +221,7 @@ p2 <- ggplot(sdf, aes(x=f_loss*100, y=y, color=type)) +
                 width=0, position=pd) + 
   xlab('% Habitat loss') + 
   ylab('') + 
-  scale_x_continuous(breaks=c(25,50, 75, 95)) +
+  scale_x_continuous(breaks=c(0, 25,50, 75, 95)) +
   theme_bw() + 
   theme(legend.position = 'top',
         strip.placement = "outside", 
@@ -231,7 +231,35 @@ p2
 
 # 6x8:
 # tiff file 600 dpi:
-tiff(filename = 'figures/plot sensitivity analysis 20250605 B sim2.tif', 
+tiff(filename = 'figures/plot sensitivity analysis 20250605 B.tif', 
      width = 6, height = 9, units = 'in', res = 600)
 p2
+dev.off()
+
+
+# clustered and random per dispersal kernel:
+pd <- position_dodge(3)
+cbp1 <- c("#009E73","#E69F00")
+p3 <- ggplot(sdf, aes(x=f_loss*100, y=y, color=mu2)) + 
+  geom_line(position=pd) + 
+  geom_point(position=pd) + 
+  scale_color_manual(values=cbp1, name='') + 
+  facet_grid(cols=vars(type), rows=vars(ylab), scales='free_y', switch='y') + 
+  geom_errorbar(aes(ymin=ymins, ymax=ymaxs), 
+                width=0, position=pd) + 
+  xlab('% Habitat loss') + 
+  ylab('') + 
+  scale_x_continuous(breaks=c(0, 25,50, 75, 95)) +
+  theme_bw() + 
+  theme(legend.position = 'top',
+        strip.placement = "outside", 
+        strip.background = element_blank()) + 
+  guides(color = guide_legend(ncol = 2)) 
+p3
+
+# 9x8:
+# tiff file 600 dpi:
+tiff(filename = 'figures/plot sensitivity analysis 20250605 B2.tif', 
+     width = 9, height = 8, units = 'in', res = 600)
+p3
 dev.off()

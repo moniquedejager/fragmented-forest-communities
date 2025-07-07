@@ -105,8 +105,8 @@ dat <- expand.grid(n_ind = 1000,
                    clustering = c(1,5), 
                    mutation_rate = 0.0003, 
                    max_mutation = 0,  
-                   sim_nr = 2:5,
-                   f_loss = c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
+                   sim_nr = 1:5,
+                   f_loss = 0, #c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
                    dispersal = 'different',  #c('similar', 'different'))
                    disp_kernel = 'exponential')
 
@@ -116,7 +116,7 @@ dat2 <- expand.grid(n_ind = 1000,
                     mutation_rate = 0.0003, 
                     max_mutation = 0,  
                     sim_nr = 1:5,
-                    f_loss = c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
+                    f_loss = 0, #c(0.25, 0.5, 0.75, 0.95), #round(seq(0, 0.95, 0.05), 2),
                     dispersal = 'different',  #c('similar', 'different'))
                     disp_kernel = c('pareto', 'gaussian'))
 dat <- rbind(dat, dat2)
