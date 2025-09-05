@@ -184,6 +184,8 @@ df2 <- df2[df2$simnr > 0,]
 
 write.table(df2, 'Fragmented-forest-communities/x64/Release/results/best_fits.txt', row.names = FALSE, col.names = TRUE)
 
+df2 <- read.table('Fragmented-forest-communities/x64/Release/results/best_fits.txt', header=TRUE)
+
 ggplot(df2, aes(x=moransI, y=N0, color=S0)) + 
   geom_point() + 
   facet_wrap(vars(round(cover, 1)))
