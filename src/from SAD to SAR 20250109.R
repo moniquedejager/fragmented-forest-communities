@@ -4,7 +4,7 @@
 library(ggplot2)
 library(meteR)
 
-simnr <- 5
+simnr <- 1
 filename2  <- paste('composition1.00_', simnr, '.00_0.00_5500.00_2.00_6.50.txt', sep='')
 filename2  <- paste('Fragmented-forest-communities/x64/Release/community composition/', filename2, sep='')
 df         <- read.table(filename2)
@@ -28,7 +28,7 @@ E <- -1 * sum(p * log(p))
 esf1 <- meteESF(S0 = length(n), N0 = sum(n))
 sad1 <- sad(esf1)
 
-plot(sad1$d(1:length(n)), log='xy')
+plot(sad1$d(1:length(n))*sum(n), log='xy', xlab='Rank', ylab='Abundance')
 p_mete <- sad1$d(1:length(n))
 E_mete <- -1 * sum(p_mete * log(p_mete))
 
@@ -66,14 +66,19 @@ for (j in areas){
   }
 }
 
-ggplot(SAR, aes(x=A, y=S, color=type)) + 
+ggplot(SAR, aes(x=A/1000*0.025, y=S, color=type)) + 
   geom_point() + 
   geom_line() + 
+  xlab('Area (km2)') + 
+  ylab('Species') + 
   scale_x_continuous(trans='log10') + 
   scale_y_continuous(trans='log10') + 
   theme_bw()
  
-sel <- SAR$type == 'Using p from simulations' 
+
+
+
+sel <- SAR$type == 'Using p from METE' 
 ggplot(SAR[sel,], aes(x=A/1000*0.025, y=S)) + 
   geom_line() +
   geom_point() + 
@@ -84,13 +89,24 @@ ggplot(SAR[sel,], aes(x=A/1000*0.025, y=S)) +
 # Biodiversity loss directly after habitat loss: 
 # p per species decreases with habitat loss: p_new = p * cover
 
-cover <- 0.9
+SAR2 <- SAR[SAR$A == -1,]
+
+cover <- 1
 p_new <- p * cover
 
 for (i in areas){
-  SAR <- rbind(SAR, list(i, sum(1 - (1 - p_new)^i), paste(cover*100, '% Habitat cover')))
+  SAR2 <- rbind(SAR2, list(A=i, S=sum(1 - (1 - p_new)^i), type=paste(cover*100, '% Habitat cover')))
 }
 
+ggplot(SAR2, aes(x=A/1000*0.025, y=S, color=type)) + 
+  geom_point() + 
+  geom_line() + 
+  xlab('Area (km2)') + 
+  ylab('Species') + 
+  scale_color_discrete(name='') + 
+  #scale_x_continuous(trans='log10') + 
+  #scale_y_continuous(trans='log10') + 
+  theme_bw()
 
 
 
