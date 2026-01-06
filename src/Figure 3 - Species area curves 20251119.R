@@ -151,6 +151,20 @@ tiff(filename = 'figures/Figure 2 without backwards SAR.tif',
 p1
 dev.off()
 
+# figures for presentation: 
+sel <- (sdf$dispersal_type == 'different')&(sdf$static_dynamic == 'Static')
+ggplot(sdf[sel,], aes(x=hab_loss, y=n_species, color=mu2)) + 
+  geom_errorbar(aes(ymin=n_species-sd, ymax=n_species+sd), width=0, position=pd) + 
+  geom_line(position=pd) +
+  geom_point(position=pd) + 
+  scale_color_manual(values = c('grey40', "#F8766D", "#00BA38", "#619CFF")) + 
+  xlab('% Habitat loss') + 
+  ylab('Total # species') +
+  ylim(c(0, 900)) + 
+  theme_bw() + 
+  theme(legend.position = 'top',
+        legend.title=element_blank())
+
 
 range(sdf$area_size)
 
