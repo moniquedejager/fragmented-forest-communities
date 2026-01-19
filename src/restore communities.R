@@ -4,16 +4,16 @@
 # nog in te verwerken: tijd tussen fragmentatie en restoratie
 # wegschrijven data per 50 iteraties
 
-n_ind = 1000
-Pm_range = 0.5
-clustering = 1
-sim_nr = 4
-mutation_rate = 0 #0.0001
-max_mutation = 0.05
-f_loss = 0.95
-hab_cover = 0.95
-clustering_restored = 1
-n_iterations = 50
+n_ind               <- 1000
+Pm_range            <- 0.5
+clustering          <- 1
+sim_nr              <- 4
+mutation_rate       <- 0.0001
+max_mutation        <- 0.05
+f_loss              <- 0.95
+hab_cover           <- 0.95
+clustering_restored <- 1
+n_iterations        <- 50
 
 restore_community <- function(n_ind, 
                               Pm_range,
